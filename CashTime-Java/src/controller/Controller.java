@@ -5,7 +5,13 @@ public class Controller {
         System.out.println("Hello world");
     }
 
-    public void test1(){
+
+    public void test1() {
         System.out.println("Test1");
+    }
+
+    public void test2() {
+        System.out.println("Test2");
+
     }
 }
