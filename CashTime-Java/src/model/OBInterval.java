@@ -22,7 +22,7 @@ public class OBInterval extends Interval {
             tempInterval.setStart(this.start);
         }
         if (interval.getEnd().isAfter(this.end)) {  // If ends after OB
-            tempInterval.setStart(this.end);
+            tempInterval.setEnd(this.end);
         }
         return tempInterval.getDuration();
     }
