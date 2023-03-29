@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RateSchedule {
-    private List<Interval> intervals;
+    private List<OBInterval> OBIntervals;
 
     public RateSchedule() {
-        intervals = new ArrayList<>();
+        OBIntervals = new ArrayList<>();
     }
 
-    public void addInterval(Interval interval) {
-        intervals.add(interval);
+    public void addInterval(OBInterval interval) {
+        OBIntervals.add(interval);
     }
 }
