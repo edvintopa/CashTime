@@ -8,10 +8,13 @@
 import SwiftUI
 
 @main
-struct CashTimeApp: App {
+struct CashTimeApp: App {           //Main-klass? Startar programmet o initialiserar allt
+    let viewModel = ViewModel()
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
+                .environmentObject(viewModel)
         }
     }
 }
