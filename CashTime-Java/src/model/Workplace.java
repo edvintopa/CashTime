@@ -6,12 +6,12 @@ import java.util.List;
 public class Workplace {
     private String name;        //Name of workplace
     private double hourlyPay;   //Base hourly pay "grundlön"
-    private List<OBInterval> rateSchedule;
+    private List<Interval> intervals;
 
     public Workplace(String name, double pay) {
         this.name = name;
         this.hourlyPay = pay;
-        this.rateSchedule = new ArrayList<>();
+        this.intervals = new ArrayList<>();
     }
 
     public String getName() {
@@ -22,7 +22,7 @@ public class Workplace {
         return hourlyPay;
     }
 
-    public List<OBInterval> getRateSchedule() {
-        return rateSchedule;
+    public List<Interval> getIntervals() {
+        return intervals;
     }
 }

@@ -9,10 +9,9 @@ public class Interval {
     LocalTime start;
     LocalTime end;
 
-    public Interval(LocalDate date, LocalTime start, LocalTime end) {
+    public Interval(LocalDate date, LocalTime start) {
         this.date = date;
         this.start = start;
-        this.end = end;
     }
 
     public LocalDate getDate() {

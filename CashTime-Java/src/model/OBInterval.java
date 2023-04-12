@@ -8,7 +8,7 @@ public class OBInterval extends Interval {
     private double extraOB;
 
     public OBInterval(LocalDate date, LocalTime start, LocalTime end, double extraOB) {
-        super(date, start, end);
+        super(date, start);
         this.extraOB = extraOB;
     }
 
@@ -18,11 +18,11 @@ public class OBInterval extends Interval {
 
     public Duration getTimeSpentInOBInterval(Interval interval) {
         Interval tempInterval = interval;
-        if (interval.getStart().isBefore(this.start)) { // If starts before OB
-            tempInterval.setStart(this.start);
+        if (interval.getStart().isBefore(super.start)) { // If starts before OB
+            tempInterval.setStart(super.start);
         }
-        if (interval.getEnd().isAfter(this.end)) {  // If ends after OB
-            tempInterval.setEnd(this.end);
+        if (interval.getEnd().isAfter(super.end)) {  // If ends after OB
+            tempInterval.setEnd(super.end);
         }
         return tempInterval.getDuration();
     }
