@@ -1,18 +1,19 @@
 package controller;
 
+import java.io.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Month;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.time.Duration;
+import java.util.Scanner;
 
 import model.Interval;
-import model.OBInterval;
 import model.Workplace;
 import view.MainFrame;
+import view.MainPanel;
+import view.HistoryPanel;
+
+import javax.swing.*;
 
 public class Controller {
     private boolean isClockedIn;
@@ -20,6 +21,8 @@ public class Controller {
     private Workplace currentWorkplace;
     private Interval currentInterval;
     private MainFrame view;
+    private MainPanel mainPanel;
+    private HistoryPanel historyPanel;
 
 
     public static void main(String[] args) {
@@ -31,18 +34,18 @@ public class Controller {
         isClockedIn = false;
         workplaces = new ArrayList<>();
         createWorkplace();
-        currentWorkplace = workplaces.get(0);
-        view = new MainFrame(400, 600, this);
+        if(workplaces.size() != 0){
+            currentWorkplace = workplaces.get(0);
+        }
+        mainPanel = new MainPanel(400, 600, this);
+        view = new MainFrame(400, 600, this, mainPanel);
     }
 
     private void createWorkplace() {
-        workplaces.add(new Workplace("ICA", 200));
-        workplaces.add(new Workplace("Willis", 120));
-
-
-
-        //workplaces.get(0).getRateSchedule().add(intervall1);
-        //workplaces.get(0).getRateSchedule().add(intervall2);
+        boolean wpAvailable = checkWorkplaces();
+        if(wpAvailable){
+            loadWorkplaces();
+        }
     }
 
     private void calcTimeSpent(Interval interval, Workplace workplace) {
@@ -64,6 +67,11 @@ public class Controller {
 
     public String[] getWorkplaces() {
         String[] str = new String[workplaces.size()];
+
+        if(workplaces.size()==0){
+            return null;
+        }
+
         for(int i=0; i< workplaces.size(); i++){
             str[i] = workplaces.get(i).getName();
         }
@@ -94,12 +102,90 @@ public class Controller {
         LocalTime time = LocalTime.now();
         currentInterval = new Interval(date, time);
         isClockedIn = true;
+        mainPanel.setClockBreak(true);
     }
 
     public void endInterval(){
         currentInterval.setEnd(LocalTime.now());
         currentWorkplace.getIntervals().add(currentInterval);
-        System.out.println(currentInterval.getDuration().toHours());
+        currentWorkplace.save();
+        System.out.println(currentInterval.getDuration());
         isClockedIn = false;
+        mainPanel.setClockBreak(false);
     }
+
+    public void breakInterval(){
+        currentInterval.setBreakTime(10);
+    }
+
+
+    public boolean checkWorkplaces(){
+        File file = new File("workplaces.text");
+        Scanner sc;
+        try {
+            sc = new Scanner(file);
+            return true;
+        } catch (FileNotFoundException e) {
+            try {
+                FileWriter writer = new FileWriter("workplaces.text");
+                return false;
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+
+
+    public void loadWorkplaces(){
+        File file = new File("workplaces.text");
+        Scanner sc;
+        try {
+            sc = new Scanner(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        String[] str;
+        int i=0;
+        try {
+            while(sc.hasNext()){
+                String s = sc.nextLine();
+                str = s.split(", ");
+                String name = str[0];
+                double hourlyPay = Double.parseDouble(str[1]);
+                Workplace newWorkplace = new Workplace(name, hourlyPay);
+                newWorkplace = newWorkplace.load();
+                workplaces.add(newWorkplace);
+
+            }
+        } catch (NullPointerException n) {}
+    }
+
+
+    public void addWorkspace(){
+        String name = JOptionPane.showInputDialog(null, "Type in your workplace:");
+        int hourlyPay = Integer.parseInt(JOptionPane.showInputDialog(null, "Type in your hourly pay:"));
+        if(!name.isEmpty())
+        workplaces.add(new Workplace(name, hourlyPay));
+        if(currentWorkplace == null){
+            currentWorkplace = workplaces.get(0);
+        }
+        mainPanel.updateBox();
+
+        FileWriter writer;
+        try {
+            writer = new FileWriter("workplaces.text", true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            writer.write(name + ", " + hourlyPay + "\n");
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
 }

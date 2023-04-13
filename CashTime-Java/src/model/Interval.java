@@ -1,17 +1,20 @@
 package model;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class Interval {
+public class Interval implements Serializable {
     LocalDate date;
     LocalTime start;
     LocalTime end;
+    int breakTime;  // seconds
 
     public Interval(LocalDate date, LocalTime start) {
         this.date = date;
         this.start = start;
+        breakTime = 0;
     }
 
     public LocalDate getDate() {
@@ -34,7 +37,12 @@ public class Interval {
         this.end = end;
     }
 
-    public Duration getDuration() {
-        return Duration.between(start, end);
+    public void setBreakTime(int breakTime){
+        this.breakTime = breakTime;
     }
+
+    public long getDuration() {
+        return Duration.between(start, end).toSeconds() - breakTime;
+    }
+
 }

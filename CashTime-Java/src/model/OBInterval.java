@@ -24,6 +24,8 @@ public class OBInterval extends Interval {
         if (interval.getEnd().isAfter(super.end)) {  // If ends after OB
             tempInterval.setEnd(super.end);
         }
-        return tempInterval.getDuration();
+        return null;
     }
+
+
 }
