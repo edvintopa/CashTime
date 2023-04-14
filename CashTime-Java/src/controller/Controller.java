@@ -90,7 +90,7 @@ public class Controller {
                 if(w.getName() == wpName){
                     currentWorkplace = w;
                     historyPanel.setSelectedWorkplace(w.getName());
-                    //historyPanel.update();
+                    historyPanel.updateTable();
                     break;
                 }
             }
@@ -127,7 +127,7 @@ public class Controller {
         System.out.println(currentInterval.getDuration());
         isClockedIn = false;
         mainPanel.setClockBreak(false);
-        historyPanel.update();
+        historyPanel.updateTable();
     }
 
     public void breakInterval(){
@@ -180,8 +180,10 @@ public class Controller {
     public void addWorkspace(){
         String name = JOptionPane.showInputDialog(null, "Type in your workplace:");
         int hourlyPay = Integer.parseInt(JOptionPane.showInputDialog(null, "Type in your hourly pay:"));
-        if(!name.isEmpty())
-        workplaces.add(new Workplace(name, hourlyPay));
+
+        if(!name.isEmpty()){
+            workplaces.add(new Workplace(name, hourlyPay));
+        }
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
         }
@@ -194,7 +196,6 @@ public class Controller {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         try {
             writer.write(name + ", " + hourlyPay + "\n");
             writer.flush();

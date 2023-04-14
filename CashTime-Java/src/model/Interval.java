@@ -41,8 +41,11 @@ public class Interval implements Serializable {
         this.breakTime = breakTime;
     }
 
-    public long getDuration() {
-        return Duration.between(start, end).toSeconds() - breakTime;
+    public String getDuration() {
+        int hours = Math.toIntExact(Duration.between(start, end).toHours());
+        int minutes = Math.toIntExact(Duration.between(start, end).toMinutes());
+        return  hours + "h " + minutes + "m ";
+
     }
 
 }
