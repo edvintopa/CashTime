@@ -8,7 +8,6 @@ public class Workplace implements Serializable{
     private String name;        //Name of workplace
     private double hourlyPay;   //Base hourly pay "grundlön"
     private List<Interval> intervals;
-    private String history;
 
     public Workplace(String name, double pay) {
         this.name = name;
@@ -57,6 +56,17 @@ public class Workplace implements Serializable{
             throw new RuntimeException(e);
         }
 
+    }
+
+    public String[][] getHistory(){
+        String[][] str = new String[intervals.size()][4];
+        for(int i=0; i< intervals.size(); i++){
+            str[i][0] = intervals.get(i).date.toString();
+            str[i][1] = intervals.get(i).start.toString();
+            str[i][2] = intervals.get(i).end.toString();
+            str[i][3] = String.valueOf(intervals.get(i).getDuration()) + " s";
+            }
+        return str;
     }
 
 

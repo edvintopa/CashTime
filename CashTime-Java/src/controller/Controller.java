@@ -37,8 +37,10 @@ public class Controller {
         if(workplaces.size() != 0){
             currentWorkplace = workplaces.get(0);
         }
+
+        historyPanel = new HistoryPanel(400, 600, this);
         mainPanel = new MainPanel(400, 600, this);
-        view = new MainFrame(400, 600, this, mainPanel);
+        view = new MainFrame(400, 600, this, mainPanel, historyPanel);
     }
 
     private void createWorkplace() {
@@ -82,13 +84,26 @@ public class Controller {
         return currentWorkplace;
     }
 
-    public void setCurrentWorkplace(String workName) {
-        for(Workplace w : workplaces){
-            if(w.getName() == workName){
-                currentWorkplace = w;
-                break;
+    public void setCurrentWorkplace(String wpName, String window) {
+        if(window == "main"){
+            for(Workplace w : workplaces){
+                if(w.getName() == wpName){
+                    currentWorkplace = w;
+                    historyPanel.setSelectedWorkplace(w.getName());
+                    //historyPanel.update();
+                    break;
+                }
+            }
+        } else {
+            for(Workplace w : workplaces){
+                if(w.getName() == wpName){
+                    currentWorkplace = w;
+                    mainPanel.setSelectedWorkplace(w.getName());
+                    break;
+                }
             }
         }
+
     }
 
 
@@ -112,6 +127,7 @@ public class Controller {
         System.out.println(currentInterval.getDuration());
         isClockedIn = false;
         mainPanel.setClockBreak(false);
+        historyPanel.update();
     }
 
     public void breakInterval(){
@@ -169,7 +185,8 @@ public class Controller {
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
         }
-        mainPanel.updateBox();
+        mainPanel.update();
+        historyPanel.update();
 
         FileWriter writer;
         try {
@@ -188,4 +205,13 @@ public class Controller {
     }
 
 
+    public void showHistory() {
+        mainPanel.setVisible(false);
+        historyPanel.setVisible(true);
+    }
+
+    public void showMainPanel() {
+        mainPanel.setVisible(true);
+        historyPanel.setVisible(false);
+    }
 }
