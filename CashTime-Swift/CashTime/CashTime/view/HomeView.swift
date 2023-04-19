@@ -33,29 +33,33 @@ struct HomeView: View {
             
             
             //Play button is showed when not clocked and toggles both below when clocked
-            Button("IN") {
-                viewModel.toggleClock(state: .inClock)
-            }
-            .buttonStyle(.bordered)
-            .background(Color.green)
-            .cornerRadius(/*@START_MENU_TOKEN@*/8.0/*@END_MENU_TOKEN@*/)
+            
+                
+                Button(action: {
+                    viewModel.toggleClock(state: .inClock)
+                }, label: {
+                    ZStack {
+                        Rectangle()
+                            .frame(width: 100, height: 50)
+                            .foregroundColor(.green)
+                        .cornerRadius(8.0)
+                        HStack {
+                            Image(systemName: "play")
+                            Text("IN")
+                        }
+                    }
+                })
+                //.buttonStyle(.bordered)
+                
+            .frame(width: 100)
+            
             
             HStack {
+                ButtonsView(title1: "RAST", title2: "UT", color1: Color(hue: 0.129, saturation: 0.871, brightness: 0.902), color2: Color.red)
                 
-                Button("RAST") {
-                    viewModel.toggleClock(state: .breakClock)
-                }
-                .buttonStyle(.bordered)
-                .background(Color.yellow)
-                .cornerRadius(/*@START_MENU_TOKEN@*/8.0/*@END_MENU_TOKEN@*/)
                 
-                Button("UT") {
-                    viewModel.toggleClock(state: .outClock)
-                }
-                .buttonStyle(.bordered)
-                .background(Color.red)
-                .cornerRadius(/*@START_MENU_TOKEN@*/8.0/*@END_MENU_TOKEN@*/)
             }
+            .frame(width: 200)
             //.hidden()
 
             
@@ -71,5 +75,44 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
         
+    }
+}
+
+struct ButtonsView: View {
+    var title1: String
+    var title2: String
+    var color1: Color
+    var color2: Color
+    var body: some View {
+        HStack {
+            Button(action: {
+                //viewModel.toggleClock(state: .breakClock)
+            }, label: {
+                ZStack {
+                    Rectangle()
+                        .frame(width: 100, height: 50)
+                        .foregroundColor(color1)
+                        .cornerRadius(8.0)
+                    HStack {
+                        Image(systemName: "pause")
+                        Text(title1)
+                    }
+                }
+            })
+            Button(action: {
+                //viewModel.toggleClock(state: .outClock)
+            }, label: {
+                ZStack {
+                    Rectangle()
+                        .frame(width: 100, height: 50)
+                        .foregroundColor(color2)
+                    .cornerRadius(8.0)
+                    HStack {
+                        Image(systemName: "stop")
+                        Text(title2)
+                    }
+                }
+            })
+        }
     }
 }

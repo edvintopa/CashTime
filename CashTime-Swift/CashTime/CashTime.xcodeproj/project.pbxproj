@@ -12,7 +12,6 @@
 		3910323E29D37C03007AB768 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3910323D29D37C03007AB768 /* Preview Assets.xcassets */; };
 		39F701AC29D97F8B00CF53A0 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F701AB29D97F8B00CF53A0 /* HomeView.swift */; };
 		39F701B029D9EBFB00CF53A0 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39F701AF29D9EBFB00CF53A0 /* ViewModel.swift */; };
-		39F701BF29DF549000CF53A0 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 39F701BD29DF549000CF53A0 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,7 +21,6 @@
 		3910323D29D37C03007AB768 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		39F701AB29D97F8B00CF53A0 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		39F701AF29D9EBFB00CF53A0 /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
-		39F701BE29DF549000CF53A0 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +53,6 @@
 		3910323529D37C01007AB768 /* CashTime */ = {
 			isa = PBXGroup;
 			children = (
-				39F701BD29DF549000CF53A0 /* Model.xcdatamodeld */,
 				3910323629D37C01007AB768 /* CashTimeApp.swift */,
 				39F701BC29DC583B00CF53A0 /* viewModel */,
 				39F701BB29DC581F00CF53A0 /* view */,
@@ -160,7 +157,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3910323729D37C01007AB768 /* CashTimeApp.swift in Sources */,
-				39F701BF29DF549000CF53A0 /* Model.xcdatamodeld in Sources */,
 				39F701B029D9EBFB00CF53A0 /* ViewModel.swift in Sources */,
 				39F701AC29D97F8B00CF53A0 /* HomeView.swift in Sources */,
 			);
@@ -291,6 +287,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CashTime/Preview Content\"";
+				DEVELOPMENT_TEAM = BGJWC7PXF8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -319,6 +316,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"CashTime/Preview Content\"";
+				DEVELOPMENT_TEAM = BGJWC7PXF8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -361,19 +359,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		39F701BD29DF549000CF53A0 /* Model.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				39F701BE29DF549000CF53A0 /* Model.xcdatamodel */,
-			);
-			currentVersion = 39F701BE29DF549000CF53A0 /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 3910322B29D37C00007AB768 /* Project object */;
 }
