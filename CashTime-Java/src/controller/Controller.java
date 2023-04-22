@@ -69,7 +69,6 @@ public class Controller {
 
     public String[] getWorkplaces() {
         String[] str = new String[workplaces.size()];
-
         if(workplaces.size()==0){
             return null;
         }
@@ -103,7 +102,6 @@ public class Controller {
                 }
             }
         }
-
     }
 
 
@@ -115,7 +113,8 @@ public class Controller {
     public void startInterval() {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-        currentInterval = new Interval(date, time);
+        currentInterval = new Interval(currentWorkplace.getIntervalIndex(), date, time);
+        currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
         mainPanel.setClockBreak(true);
     }
@@ -171,7 +170,6 @@ public class Controller {
                 Workplace newWorkplace = new Workplace(name, hourlyPay);
                 newWorkplace = newWorkplace.load();
                 workplaces.add(newWorkplace);
-
             }
         } catch (NullPointerException n) {}
     }
@@ -182,7 +180,9 @@ public class Controller {
         int hourlyPay = Integer.parseInt(JOptionPane.showInputDialog(null, "Type in your hourly pay:"));
 
         if(!name.isEmpty()){
-            workplaces.add(new Workplace(name, hourlyPay));
+            Workplace newWorkplace = new Workplace(name, hourlyPay);
+            workplaces.add(newWorkplace);
+            newWorkplace.save();
         }
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
@@ -215,4 +215,5 @@ public class Controller {
         mainPanel.setVisible(true);
         historyPanel.setVisible(false);
     }
+
 }

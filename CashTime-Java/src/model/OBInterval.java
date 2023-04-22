@@ -8,7 +8,7 @@ public class OBInterval extends Interval {
     private double extraOB;
 
     public OBInterval(LocalDate date, LocalTime start, LocalTime end, double extraOB) {
-        super(date, start);
+        super(0 , date, start);
         this.extraOB = extraOB;
     }
 

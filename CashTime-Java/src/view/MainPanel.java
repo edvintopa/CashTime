@@ -61,7 +61,6 @@ public class MainPanel extends JPanel {
         this.clockBreak.setVisible(b);
     }
 
-
     public void update(){
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }

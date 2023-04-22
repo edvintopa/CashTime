@@ -6,12 +6,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Interval implements Serializable {
+    int index;
     LocalDate date;
     LocalTime start;
     LocalTime end;
     int breakTime;  // seconds
 
-    public Interval(LocalDate date, LocalTime start) {
+    public Interval(int index, LocalDate date, LocalTime start) {
+        this.index = index;
         this.date = date;
         this.start = start;
         breakTime = 0;
@@ -48,4 +50,11 @@ public class Interval implements Serializable {
 
     }
 
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public int getIndex() {
+        return index;
+    }
 }
