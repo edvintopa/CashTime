@@ -17,6 +17,7 @@ public class HistoryPanel extends JPanel {
     private JComboBox workplaces;
     private String[] columns;
     private JTable table;
+    private Button backButton;
 
     public HistoryPanel(int width, int height, Controller controller) {
         super(null);
@@ -36,11 +37,11 @@ public class HistoryPanel extends JPanel {
         workplaces.addActionListener(workplaces);
         this.add(workplaces);
 
-        Button back = new Button("<", controller);
-        back.setSize(45, 45);
-        back.setLocation(5, 5);
-        back.addActionListener(back);
-        this.add(back);
+        backButton = new Button("<", controller);
+        backButton.setSize(45, 45);
+        backButton.setLocation(5, 5);
+        backButton.addActionListener(backButton);
+        this.add(backButton);
 
         columns = new String[]{" ", "Date", "Start", "End", "Duration"};
         DefaultTableModel tableModel = createTableModel(controller);
@@ -85,6 +86,10 @@ public class HistoryPanel extends JPanel {
             }
         };
         return tableModel;
+    }
+
+    public JButton getBackButton() {
+        return backButton;
     }
 
     class CustomTableModelListener implements TableModelListener {
