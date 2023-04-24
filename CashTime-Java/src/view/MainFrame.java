@@ -3,6 +3,7 @@ package view;
 import controller.Controller;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class MainFrame extends JFrame {
     private Controller controller;
@@ -13,10 +14,10 @@ public class MainFrame extends JFrame {
         this.controller = controller;
         setResizable(false);
         setSize(width,height);
+        setLocationRelativeTo(null);
         add(mainPanel);
         historyPanel.setVisible(false);
         add(historyPanel);
-        setLocationRelativeTo(null);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
