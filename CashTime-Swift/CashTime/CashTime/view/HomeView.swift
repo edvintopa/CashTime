@@ -23,6 +23,7 @@ struct HomeView: View {
                 ClockView()             //Clock showing current time
                 
                 if !isClockedIn {
+                    WorkPlacePicker()
                     InButtonView(isClockedIn: $isClockedIn)      //Button for clocking in
                 }
                 else {
@@ -176,5 +177,20 @@ struct TimerView: View {
             .onAppear {
                 startTime = Date()
             }
+    }
+}
+
+struct WorkPlacePicker: View {
+    @State var selectedWorkplace = "hey"
+    
+    var body: some View {
+        
+        Picker(selection: $selectedWorkplace) {
+            Text("ICA")
+            Text("Coop")
+            Text("Biltema")
+        } label: {
+            Text("Select workplace")
+        }
     }
 }
