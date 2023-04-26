@@ -113,7 +113,6 @@ struct BreakOutButtonsView: View {
     
     var body: some View {
         HStack {
-            
             //Button for registering break
             Button(action: {
                 //action
@@ -122,16 +121,14 @@ struct BreakOutButtonsView: View {
                 ZStack {
                     Rectangle()
                         .frame(width: 100, height: 50)
-                        .foregroundColor(color.Yellow)
+                        .foregroundColor(Color.yellow)
                         .cornerRadius(8.0)
                     HStack {
                         Image(systemName: "pause")
                         Text("RAST")
-                        .foregroundColor(Color.red)
-                        .cornerRadius(8.0)
+                    }
                 }
             })
-        }
             
             //Button for registering end of shift
             Button(action: {
@@ -141,13 +138,12 @@ struct BreakOutButtonsView: View {
                 ZStack {
                     Rectangle()
                         .frame(width: 100, height: 50)
-                        .foregroundColor(color.Red)
+                        .foregroundColor(Color.red)
                         .cornerRadius(8.0)
                     HStack {
                         Image(systemName: "stop")
                         Text("UT")
-                        .foregroundColor(Color.red)
-                        .cornerRadius(8.0)
+                    }
                 }
             })
         }
@@ -155,7 +151,6 @@ struct BreakOutButtonsView: View {
 }
 
 struct TimerView: View {
-    
     @State private var startTime: Date?
     @State private var elapsedTime: TimeInterval = 0.0
     
