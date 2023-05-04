@@ -31,7 +31,7 @@ public class Workplace implements Serializable{
     }
 
 
-    public void save() {
+    public void saveWorkplaceInDatFile() {
         ObjectOutputStream oos;
         try {
             oos = new ObjectOutputStream(new FileOutputStream(name + ".dat"));
@@ -45,7 +45,7 @@ public class Workplace implements Serializable{
         }
     }
 
-    public Workplace load(){
+    public Workplace loadFromDatFile(){
         ObjectInputStream ois;
         try {
             ois = new ObjectInputStream(new FileInputStream(name + ".dat"));
@@ -61,10 +61,10 @@ public class Workplace implements Serializable{
 
     }
 
-    public String[][] getHistory(){
+    public String[][] getIntervalHistoryToString(){
         String[][] str = new String[intervals.size()][5];
         for(int i=0; i< intervals.size(); i++){
-            str[i][0] = String.valueOf(intervals.get(i).getIndex());
+            str[i][0] = String.valueOf(intervals.get(i).getIntervalId());
             str[i][1] = intervals.get(i).date.toString();
             str[i][2] = intervals.get(i).start.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
             str[i][3] = intervals.get(i).end.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));

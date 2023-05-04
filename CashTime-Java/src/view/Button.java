@@ -27,7 +27,7 @@ public class Button extends JButton implements ActionListener {
                 controller.breakInterval();
                 break;
             case "History":
-                controller.showHistory();
+                controller.showHistoryPanel();
                 break;
             case "+":
                 controller.addWorkspace();

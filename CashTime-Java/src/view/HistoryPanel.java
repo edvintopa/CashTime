@@ -1,5 +1,4 @@
 package view;
-import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 import controller.Controller;
 
@@ -104,7 +103,7 @@ public class HistoryPanel extends JPanel {
         this.add(endDateLabel);
     }
 
-    public void update() {
+    public void updateWorkplaceBox() {
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }
 
@@ -128,7 +127,7 @@ public class HistoryPanel extends JPanel {
         String[][] data;
 
         if (controller.getCurrentWorkplace() != null) {
-            data = controller.getCurrentWorkplace().getHistory();
+            data = controller.getCurrentWorkplace().getIntervalHistoryToString();
         } else {
             String[] emptyRow = {"","", "", "", ""};
             data = new String[][]{emptyRow};
@@ -192,7 +191,7 @@ public class HistoryPanel extends JPanel {
                         System.out.println("Changed");
                         break;
                 }
-                controller.getCurrentWorkplace().save();
+                controller.getCurrentWorkplace().saveWorkplaceInDatFile();
             }
         }
     }

@@ -6,14 +6,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Interval implements Serializable {
-    int index;
+    int intervalId;
     LocalDate date;
     LocalTime start;
     LocalTime end;
     int breakTime;  // seconds
 
-    public Interval(int index, LocalDate date, LocalTime start) {
-        this.index = index;
+    public Interval(int intervalId, LocalDate date, LocalTime start) {
+        this.intervalId = intervalId;
         this.date = date;
         this.start = start;
         breakTime = 0;
@@ -32,29 +32,38 @@ public class Interval implements Serializable {
     }
 
     public void setStart(LocalTime start) {
-        this.start = start;
+        if (start != null){
+            this.start = start;
+        }
     }
 
     public void setEnd(LocalTime end) {
-        this.end = end;
+        if (end != null){
+            this.end = end;
+
+        }
     }
 
     public void setBreakTime(int breakTime){
         this.breakTime = breakTime;
     }
 
+    /**
+     * Calculates the duration in hours and with the minutes left that could not be counted as a whole hour.
+     * @return
+     */
     public String getDuration() {
-        int hours = Math.toIntExact(Duration.between(start, end).toHours());
-        int minutes = Math.toIntExact(Duration.between(start, end).toMinutes());
-        return  hours + "h " + minutes + "m ";
-
+        long durationMinutes = Duration.between(start, end).toMinutes();
+        int hours = (int) (durationMinutes / 60);
+        int minutes = (int) (durationMinutes % 60);
+        return hours + "h " + minutes + "m";
     }
 
     public void setDate(LocalDate date) {
         this.date = date;
     }
 
-    public int getIndex() {
-        return index;
+    public int getIntervalId() {
+        return intervalId;
     }
 }

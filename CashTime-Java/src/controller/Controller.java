@@ -10,7 +10,7 @@ import java.util.Scanner;
 import model.Interval;
 import model.Workplace;
 import view.MainFrame;
-import view.MainPanel;
+import view.HomePanel;
 import view.HistoryPanel;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class Controller {
     private Workplace currentWorkplace;
     private Interval currentInterval;
     private MainFrame view;
-    private MainPanel mainPanel;
+    private HomePanel homePanel;
     private HistoryPanel historyPanel;
 
 
@@ -39,14 +39,14 @@ public class Controller {
         }
 
         historyPanel = new HistoryPanel(400, 600, this);
-        mainPanel = new MainPanel(400, 600, this);
-        view = new MainFrame(400, 600, this, mainPanel, historyPanel);
+        homePanel = new HomePanel(400, 600, this);
+        view = new MainFrame(400, 600, this, homePanel, historyPanel);
     }
 
     private void createWorkplace() {
-        boolean wpAvailable = checkWorkplaces();
+        boolean wpAvailable = checkWorkplacesInTextFile();
         if(wpAvailable){
-            loadWorkplaces();
+            loadSavedWorkplacesFromFile();
         }
     }
 
@@ -97,7 +97,7 @@ public class Controller {
             for(Workplace w : workplaces){
                 if(w.getName() == wpName){
                     currentWorkplace = w;
-                    mainPanel.setSelectedWorkplace(w.getName());
+                    homePanel.setSelectedWorkplace(w.getName());
                     break;
                 }
             }
@@ -116,16 +116,16 @@ public class Controller {
         currentInterval = new Interval(currentWorkplace.getIntervalIndex(), date, time);
         currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
-        mainPanel.setClockBreak(true);
+        homePanel.setClockBreak(true);
     }
 
     public void endInterval(){
         currentInterval.setEnd(LocalTime.now());
         currentWorkplace.getIntervals().add(currentInterval);
-        currentWorkplace.save();
+        currentWorkplace.saveWorkplaceInDatFile();
         System.out.println(currentInterval.getDuration());
         isClockedIn = false;
-        mainPanel.setClockBreak(false);
+        homePanel.setClockBreak(false);
         historyPanel.updateTable();
     }
 
@@ -134,7 +134,7 @@ public class Controller {
     }
 
 
-    public boolean checkWorkplaces(){
+    public boolean checkWorkplacesInTextFile(){
         File file = new File("workplaces.text");
         Scanner sc;
         try {
@@ -151,7 +151,7 @@ public class Controller {
     }
 
 
-    public void loadWorkplaces(){
+    public void loadSavedWorkplacesFromFile(){
         File file = new File("workplaces.text");
         Scanner sc;
         try {
@@ -168,7 +168,7 @@ public class Controller {
                 String name = str[0];
                 double hourlyPay = Double.parseDouble(str[1]);
                 Workplace newWorkplace = new Workplace(name, hourlyPay);
-                newWorkplace = newWorkplace.load();
+                newWorkplace = newWorkplace.loadFromDatFile();
                 workplaces.add(newWorkplace);
             }
         } catch (NullPointerException n) {}
@@ -182,13 +182,13 @@ public class Controller {
         if(!name.isEmpty()){
             Workplace newWorkplace = new Workplace(name, hourlyPay);
             workplaces.add(newWorkplace);
-            newWorkplace.save();
+            newWorkplace.saveWorkplaceInDatFile();
         }
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
         }
-        mainPanel.update();
-        historyPanel.update();
+        homePanel.updateWorkplaceBox();
+        historyPanel.updateWorkplaceBox();
 
         FileWriter writer;
         try {
@@ -206,13 +206,13 @@ public class Controller {
     }
 
 
-    public void showHistory() {
-        mainPanel.setVisible(false);
+    public void showHistoryPanel() {
+        homePanel.setVisible(false);
         historyPanel.setVisible(true);
     }
 
     public void showMainPanel() {
-        mainPanel.setVisible(true);
+        homePanel.setVisible(true);
         historyPanel.setVisible(false);
     }
 

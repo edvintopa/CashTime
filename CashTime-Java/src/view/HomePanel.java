@@ -6,14 +6,14 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class MainPanel extends JPanel {
+public class HomePanel extends JPanel {
     private Controller controller;
     private Button clockBreak;
     private JComboBox workplaces;
     private Button history;
 
 
-    public MainPanel(int width, int height, Controller controller){
+    public HomePanel(int width, int height, Controller controller){
         super(null);
         this.controller = controller;
         setSize(width,height);
@@ -84,7 +84,7 @@ public class MainPanel extends JPanel {
         this.clockBreak.setVisible(b);
     }
 
-    public void update(){
+    public void updateWorkplaceBox(){
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }
 
