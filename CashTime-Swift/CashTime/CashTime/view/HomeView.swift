@@ -9,7 +9,9 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @State var isClockedIn = false
+    @State private var isClockedIn = false
+    @State private var selectedWorkplace = "Coop"
+    @State private var showNewWorkplaceView = false
     
     var body: some View {
         
@@ -23,7 +25,8 @@ struct HomeView: View {
                 ClockView()             //Clock showing current time
                 
                 if !isClockedIn {
-                    WorkPlacePicker()
+                    ExtractedView(selectedWorkplace: $selectedWorkplace, showNewWorkplaceView: $showNewWorkplaceView)
+                    
                     InButtonView(isClockedIn: $isClockedIn)      //Button for clocking in
                 }
                 else {
@@ -32,6 +35,11 @@ struct HomeView: View {
                 }
 
                 Spacer()
+                
+                //Link to NewWorkplaceView
+                NavigationLink(destination: NewWorkplaceView(), isActive: $showNewWorkplaceView) {
+                    //no label
+                }
                 
                 //Link to HistoryView
                 NavigationLink(destination: HistoryView()) {
@@ -59,7 +67,7 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
-        
+            .environment(\.colorScheme, .dark)
     }
 }
 
@@ -180,17 +188,38 @@ struct TimerView: View {
     }
 }
 
-struct WorkPlacePicker: View {
-    @State var selectedWorkplace = "hey"
+struct ExtractedView: View {
+    @Binding var selectedWorkplace: String
+    @Binding var showNewWorkplaceView: Bool
     
     var body: some View {
-        
-        Picker(selection: $selectedWorkplace) {
-            Text("ICA")
-            Text("Coop")
-            Text("Biltema")
+        Menu {
+            Button {
+                selectedWorkplace = "ICA"
+            } label: {
+                Text("ICA")
+            }
+            
+            Button {
+                selectedWorkplace = "Coop"
+            } label: {
+                Text("Coop")
+            }
+            
+            Button {
+                showNewWorkplaceView = true     //trigger to activate view
+            } label: {
+                Image(systemName: "plus")
+                Text("Ny arbetsplats")
+            }
+            
+            
         } label: {
-            Text("Select workplace")
+            Label {
+                Text("\(selectedWorkplace)")
+            } icon: {
+                //none for now
+            }
         }
     }
 }
