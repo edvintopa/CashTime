@@ -1,2 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier=""/>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="21754" systemVersion="22A380" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="CashTime_Interval" representedClassName="CashTime_Interval" syncable="YES">
+        <attribute name="end" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="start" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="workplace" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CashTime_Workplace" inverseName="intervals" inverseEntity="CashTime_Workplace"/>
+    </entity>
+    <entity name="CashTime_OBInterval" representedClassName="CashTime_OBInterval" parentEntity="CashTime_Interval" syncable="YES">
+        <attribute name="dayOfWeek" optional="YES" attributeType="String"/>
+        <attribute name="extraPay" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+    </entity>
+    <entity name="CashTime_Workplace" representedClassName="CashTime_Workplace" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="obIntervals" optional="YES" attributeType="Transformable"/>
+        <attribute name="pay" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <relationship name="intervals" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CashTime_Interval" inverseName="workplace" inverseEntity="CashTime_Interval"/>
+    </entity>
+</model>

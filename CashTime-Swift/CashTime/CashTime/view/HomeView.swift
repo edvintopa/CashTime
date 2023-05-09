@@ -25,7 +25,7 @@ struct HomeView: View {
                 ClockView()             //Clock showing current time
                 
                 if !isClockedIn {
-                    ExtractedView(selectedWorkplace: $selectedWorkplace, showNewWorkplaceView: $showNewWorkplaceView)
+                    WorkplaceSelectorView(selectedWorkplace: $selectedWorkplace, showNewWorkplaceView: $showNewWorkplaceView)
                     
                     InButtonView(isClockedIn: $isClockedIn)      //Button for clocking in
                 }
@@ -188,12 +188,14 @@ struct TimerView: View {
     }
 }
 
-struct ExtractedView: View {
+struct WorkplaceSelectorView: View {
     @Binding var selectedWorkplace: String
     @Binding var showNewWorkplaceView: Bool
     
     var body: some View {
         Menu {
+            
+            //foreach workplace
             Button {
                 selectedWorkplace = "ICA"
             } label: {
