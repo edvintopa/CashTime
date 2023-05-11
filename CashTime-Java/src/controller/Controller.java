@@ -1,13 +1,15 @@
 package controller;
 
+import java.awt.*;
 import java.io.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import model.EconomyPanel;
 import model.Interval;
+import model.OverTime;
 import model.Workplace;
 import view.MainFrame;
 import view.MainPanel;
@@ -23,6 +25,7 @@ public class Controller {
     private MainFrame view;
     private MainPanel mainPanel;
     private HistoryPanel historyPanel;
+    private EconomyPanel economyPanel;
 
 
     public static void main(String[] args) {
@@ -38,9 +41,10 @@ public class Controller {
             currentWorkplace = workplaces.get(0);
         }
 
-        historyPanel = new HistoryPanel(400, 600, this);
-        mainPanel = new MainPanel(400, 600, this);
-        view = new MainFrame(400, 600, this, mainPanel, historyPanel);
+        historyPanel = new HistoryPanel(500, 600, this);
+        economyPanel = new EconomyPanel(500, 600, this);
+        mainPanel = new MainPanel(500, 600, this);
+        view = new MainFrame(500, 600, this, mainPanel, historyPanel, economyPanel);
     }
 
     private void createWorkplace() {
@@ -90,6 +94,8 @@ public class Controller {
                     currentWorkplace = w;
                     historyPanel.setSelectedWorkplace(w.getName());
                     historyPanel.updateTable();
+                    economyPanel.setSelectedWorkplace(w.getName());
+                    //economyPanel.update();
                     break;
                 }
             }
@@ -112,7 +118,7 @@ public class Controller {
 
     public void startInterval() {
         LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
+        LocalDateTime time = LocalDateTime.now();
         currentInterval = new Interval(currentWorkplace.getIntervalIndex(), date, time);
         currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
@@ -120,14 +126,23 @@ public class Controller {
     }
 
     public void endInterval(){
-        currentInterval.setEnd(LocalTime.now());
+        currentInterval.setEnd(LocalDateTime.now());
+        currentInterval.calculateDuration();
+        currentInterval.calculateInterval(this);
         currentWorkplace.getIntervals().add(currentInterval);
         currentWorkplace.save();
-        System.out.println(currentInterval.getDuration());
         isClockedIn = false;
         mainPanel.setClockBreak(false);
         historyPanel.updateTable();
     }
+
+    public void updateInterval(){
+        for(int i=0; i<currentWorkplace.getIntervals().size(); i++){
+            currentWorkplace.getIntervals().get(i).calculateInterval(this);
+        }
+    }
+
+
 
     public void breakInterval(){
         currentInterval.setBreakTime(10);
@@ -188,7 +203,8 @@ public class Controller {
             currentWorkplace = workplaces.get(0);
         }
         mainPanel.update();
-        historyPanel.update();
+        historyPanel.updateWorkplaces();
+        economyPanel.updateWorkplaces();
 
         FileWriter writer;
         try {
@@ -205,15 +221,135 @@ public class Controller {
         }
     }
 
+    public void addOverTime() {
+        Object[] options = {"Weekly Overtime", "Specific Overtime"};
+        int choice = JOptionPane.showOptionDialog(null, "Choose overtime type:", "Overtime", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        LocalDateTime startDateTime = null;
+        LocalDateTime endDateTime = null;
+        int percentage = 0;
+        List<DayOfWeek> overTimeDays = null;
+        switch (choice) {
+            case 0: // Weekly overtime
+                JPanel panel = new JPanel(new GridLayout(4, 2));
+                panel.add(new JLabel("Start Time:"));
+                JTextField startTimeField = new JTextField("00:00");
+                panel.add(startTimeField);
+                panel.add(new JLabel("End Time:"));
+                JTextField endTimeField = new JTextField("00:00");
+                panel.add(endTimeField);
+                panel.add(new JLabel("Percentage:"));
+                JTextField percentageField = new JTextField("50");
+                panel.add(percentageField);
+                DayOfWeek[] daysOfWeek = {DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY, DayOfWeek.THURSDAY, DayOfWeek.FRIDAY, DayOfWeek.SATURDAY, DayOfWeek.SUNDAY};
+                JCheckBox[] checkBoxes = new JCheckBox[7];
+                for (int i = 0; i < checkBoxes.length; i++) {
+                    checkBoxes[i] = new JCheckBox(daysOfWeek[i].toString());
+                    panel.add(checkBoxes[i]);
+                }
+                int result = JOptionPane.showConfirmDialog(null, panel, "Weekly Overtime", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    LocalTime startTime = LocalTime.parse(startTimeField.getText());
+                    LocalTime endTime = LocalTime.parse(endTimeField.getText());
+                    percentage = Integer.parseInt(percentageField.getText());
+                    overTimeDays = new ArrayList<>();
+                    for (int i = 0; i < checkBoxes.length; i++) {
+                        if (checkBoxes[i].isSelected()) {
+                            overTimeDays.add(daysOfWeek[i]);
+                        }
+                    }
+                    startDate = LocalDate.now();
+                    endDate = startDate.plusDays(6);
+                    while (!overTimeDays.contains(startDate.getDayOfWeek())) {
+                        startDate = startDate.plusDays(1);
+                    }
+                    while (!overTimeDays.contains(endDate.getDayOfWeek())) {
+                        endDate = endDate.minusDays(1);
+                    }
+                    startDateTime = startTime.atDate(startDate);
+                    endDateTime = endTime.atDate(startDate);
+                } else {
+                    return;
+                }
+                break;
+
+            case 1: // Specific overtime
+                JPanel specificPanel = new JPanel(new GridLayout(4, 2));
+                specificPanel.add(new JLabel("Start Date:"));
+                JTextField startDateField = new JTextField();
+                specificPanel.add(startDateField);
+                specificPanel.add(new JLabel("Start Time:"));
+                startTimeField = new JTextField("00:00");
+                specificPanel.add(startTimeField);
+                specificPanel.add(new JLabel("End Date:"));
+                JTextField endDateField = new JTextField();
+                specificPanel.add(endDateField);
+                specificPanel.add(new JLabel("End Time:"));
+                endTimeField = new JTextField("00:00");
+                specificPanel.add(endTimeField);
+                specificPanel.add(new JLabel("Percentage:"));
+                percentageField = new JTextField("50");
+                specificPanel.add(percentageField);
+                int specificResult = JOptionPane.showConfirmDialog(null, specificPanel, "Specific Overtime", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (specificResult == JOptionPane.OK_OPTION) {
+                    LocalDate specificStartDate = LocalDate.parse(startDateField.getText());
+                    LocalTime specificStartTime = LocalTime.parse(startTimeField.getText());
+                    LocalDate specificEndDate = LocalDate.parse(endDateField.getText());
+                    LocalTime specificEndTime = LocalTime.parse(endTimeField.getText());
+                    percentage = Integer.parseInt(percentageField.getText());
+                    overTimeDays = null;
+                    startDate = specificStartDate;
+                    endDate = specificEndDate;
+                    startDateTime = specificStartTime.atDate(specificStartDate);
+                    endDateTime = specificEndTime.atDate(specificEndDate);
+                } else {
+                    return;
+                }
+                break;
+
+            default:
+                return;
+        }
+
+        for (OverTime overTime : currentWorkplace.getOverTimes()) {
+            if (overTime.getOverTimeDays() != null && overTime.getOverTimeDays().equals(overTimeDays)) {
+                if (overTime.getStart().isBefore(endDateTime) && overTime.getEnd().isAfter(startDateTime)) {
+                    JOptionPane.showMessageDialog(null, "The new overtime overlaps with an existing overtime of the same kind.");
+                    return;
+                }
+            }
+        }
+
+        currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime, endDateTime, percentage, overTimeDays));
+    }
+
+
+
+
+
 
     public void showHistory() {
+        if(currentWorkplace!=null) updateInterval();
         mainPanel.setVisible(false);
         historyPanel.setVisible(true);
+        historyPanel.updateTable();
     }
 
     public void showMainPanel() {
         mainPanel.setVisible(true);
         historyPanel.setVisible(false);
+        economyPanel.setVisible(false);
     }
 
+    public void showEconomy() {
+        mainPanel.setVisible(false);
+        economyPanel.setVisible(true);
+        economyPanel.updatePage();
+    }
+
+    public void showOverTime() {
+
+    }
 }

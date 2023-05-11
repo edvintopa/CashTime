@@ -1,5 +1,4 @@
 package view;
-import com.toedter.calendar.JCalendar;
 import com.toedter.calendar.JDateChooser;
 import controller.Controller;
 
@@ -8,9 +7,7 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
@@ -31,7 +28,6 @@ public class HistoryPanel extends JPanel {
         this.controller = controller;
         setSize(width, height);
 
-        //Create the workplace chooser
         if (controller.getWorkplaces() == null) {
             String[] str = new String[1];
             str[0] = "No workplace added";
@@ -45,66 +41,59 @@ public class HistoryPanel extends JPanel {
         workplaces.addActionListener(workplaces);
         this.add(workplaces);
 
-        // Create the workplace label
         JLabel workplaceLabel = new JLabel("Workplace:");
         workplaceLabel.setBounds(78, 10, 80, 20);
         this.add(workplaceLabel);
 
-        //Create the back button
         backButton = new Button("<", controller);
         backButton.setSize(45, 45);
         backButton.setLocation(5, 5);
         backButton.addActionListener(backButton);
         this.add(backButton);
 
-        //Create the table data
-        columns = new String[]{" ", "Date", "Start", "End", "Duration"};
+        columns = new String[]{" ", "Date", "Start", "End", "Hours", "OverTime"};
         DefaultTableModel tableModel = createTableModel(controller, null,null);
         table = new JTable(tableModel);
+        table.getColumnModel().getColumn(0).setPreferredWidth(15);
+        table.getColumnModel().getColumn(4).setPreferredWidth(60);
         table.getModel().addTableModelListener(new CustomTableModelListener(controller));
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setSize(400, 400);
+        scrollPane.setSize(width, 400);
         scrollPane.setLocation(0, 150);
         table.setFillsViewportHeight(true);
         add(scrollPane);
         table.setAutoCreateRowSorter(true);
 
-        // Create the start date chooser
         startDateChooser = new JDateChooser();
         startDateChooser.setBounds(150, 55, 150, 30);
         startDateChooser.addPropertyChangeListener("date", e -> updateTable());
         this.add(startDateChooser);
 
-        // Create the "Clear" button for the start date
         JButton clearStartDateButton = new JButton("Clear");
         clearStartDateButton.setBounds(310, 55, 70, 30);
         clearStartDateButton.addActionListener(e -> startDateChooser.setDate(null));
         this.add(clearStartDateButton);
 
-        // Create the start date label
         JLabel startDateLabel = new JLabel("From:");
         startDateLabel.setBounds(110, 60, 40, 20);
         this.add(startDateLabel);
 
-        // Create the end date chooser
         endDateChooser = new JDateChooser();
         endDateChooser.setBounds(150, 105, 150, 30);
         endDateChooser.addPropertyChangeListener("date", e -> updateTable());
         this.add(endDateChooser);
 
-        // Create the "Clear" button for the end date
         JButton clearEndDateButton = new JButton("Clear");
         clearEndDateButton.setBounds(310, 105, 70, 30);
         clearEndDateButton.addActionListener(e -> endDateChooser.setDate(null));
         this.add(clearEndDateButton);
 
-        // Create the end date label
         JLabel endDateLabel = new JLabel("To:");
         endDateLabel.setBounds(124, 110, 40, 20);
         this.add(endDateLabel);
     }
 
-    public void update() {
+    public void updateWorkplaces() {
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }
 
@@ -121,6 +110,8 @@ public class HistoryPanel extends JPanel {
                 : null;
 
         table.setModel(createTableModel(controller, startDate, endDate));
+        table.getColumnModel().getColumn(0).setPreferredWidth(15);
+        table.getColumnModel().getColumn(4).setPreferredWidth(60);
         table.getModel().addTableModelListener(new CustomTableModelListener(controller));
     }
 
@@ -130,7 +121,7 @@ public class HistoryPanel extends JPanel {
         if (controller.getCurrentWorkplace() != null) {
             data = controller.getCurrentWorkplace().getHistory();
         } else {
-            String[] emptyRow = {"","", "", "", ""};
+            String[] emptyRow = {"","", "", "", "", ""};
             data = new String[][]{emptyRow};
         }
 
@@ -146,7 +137,7 @@ public class HistoryPanel extends JPanel {
             data = filteredData.toArray(new String[0][0]);
         }
 
-        //Make table editable.
+
         DefaultTableModel tableModel = new DefaultTableModel(data, columns) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -159,6 +150,9 @@ public class HistoryPanel extends JPanel {
     public JButton getBackButton() {
         return backButton;
     }
+
+
+
 
     class CustomTableModelListener implements TableModelListener {
         private Controller controller;
@@ -173,27 +167,41 @@ public class HistoryPanel extends JPanel {
                 int row = e.getFirstRow();
                 int column = e.getColumn();
 
-                // Updates interval
+
                 String newValue = (String) table.getValueAt(row, column);
                 switch (column) {
                     case 0:
                         break;
-                    case 1: // Date
+                    case 1:
                         LocalDate newDate = LocalDate.parse(newValue);
                         controller.getCurrentWorkplace().getIntervals().get(row).setDate(newDate);
+                        controller.getCurrentWorkplace().getIntervals().get(row).calculateInterval(controller, newDate);
                         break;
-                    case 2: // Start
-                        LocalTime newStart = LocalTime.parse(newValue, DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+                    case 2:
+                        LocalTime newTimeValue = LocalTime.parse(newValue, DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+                        LocalDateTime newStart = LocalDateTime.of(controller.getCurrentWorkplace().getIntervals().get(row).getDate(), newTimeValue);
                         controller.getCurrentWorkplace().getIntervals().get(row).setStart(newStart);
+                        controller.getCurrentWorkplace().getIntervals().get(row).calculateDuration();
+                        controller.getCurrentWorkplace().getIntervals().get(row).calculateInterval(controller);
                         break;
-                    case 3: // End
-                        LocalTime newEnd = LocalTime.parse(newValue, DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+                    case 3:
+                        newTimeValue = LocalTime.parse(newValue, DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+                        LocalDateTime newEnd = LocalDateTime.of(controller.getCurrentWorkplace().getIntervals().get(row).getDate(), newTimeValue);
                         controller.getCurrentWorkplace().getIntervals().get(row).setEnd(newEnd);
-                        System.out.println("Changed");
+                        controller.getCurrentWorkplace().getIntervals().get(row).calculateDuration();
+                        controller.getCurrentWorkplace().getIntervals().get(row).calculateInterval(controller);
+
                         break;
+                    case 4:
+                        controller.getCurrentWorkplace().getIntervals().get(row).setDuration(newValue);
                 }
                 controller.getCurrentWorkplace().save();
+                updateTable();
             }
         }
     }
+
+
+
+
 }

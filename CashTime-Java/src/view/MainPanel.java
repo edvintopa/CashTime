@@ -11,6 +11,7 @@ public class MainPanel extends JPanel {
     private Button clockBreak;
     private JComboBox workplaces;
     private Button history;
+    private Button economy;
 
 
     public MainPanel(int width, int height, Controller controller){
@@ -60,14 +61,15 @@ public class MainPanel extends JPanel {
         this.add(clockBreak);
         clockBreak.setVisible(false);
 
-        Button wpAdd = new Button("+", controller);
-        wpAdd.setFont(new Font("Arial", Font.PLAIN, 20));
-        wpAdd.setSize(50, 50);
-        wpAdd.setLocation(width - wpAdd.getWidth() - 20, 20);
-        wpAdd.setBackground(Color.BLACK);
-        wpAdd.setForeground(new Color(255, 215, 0));
-        wpAdd.addActionListener(wpAdd);
-        this.add(wpAdd);
+        Button workplaceAddButton = new Button("+", controller);
+        workplaceAddButton.setName("addWorkplace");
+        workplaceAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        workplaceAddButton.setSize(50, 50);
+        workplaceAddButton.setLocation(width - workplaceAddButton.getWidth() - 20, 20);
+        workplaceAddButton.setBackground(Color.BLACK);
+        workplaceAddButton.setForeground(new Color(255, 215, 0));
+        workplaceAddButton.addActionListener(workplaceAddButton);
+        this.add(workplaceAddButton);
 
         history = new Button("History", controller);
         history.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -77,6 +79,27 @@ public class MainPanel extends JPanel {
         history.setForeground(new Color(255, 215, 0));
         history.addActionListener(history);
         this.add(history);
+
+        economy = new Button("Economy", controller);
+        economy.setFont(new Font("Arial", Font.PLAIN, 16));
+        economy.setSize(100, 45);
+        economy.setLocation(120, 20);
+        economy.setBackground(Color.BLACK);
+        economy.setForeground(new Color(255, 215, 0));
+        economy.addActionListener(economy);
+        this.add(economy);
+
+
+        Button overTimeAddButton = new Button("+", controller);
+        overTimeAddButton.setName("addOverTime");
+        overTimeAddButton.setFont(new Font("Arial", Font.PLAIN, 20));
+        overTimeAddButton.setSize(50, 50);
+        overTimeAddButton.setLocation(width - overTimeAddButton.getWidth() - 20, 90);
+        overTimeAddButton.setBackground(Color.BLACK);
+        overTimeAddButton.setForeground(new Color(255, 215, 0));
+        overTimeAddButton.addActionListener(overTimeAddButton);
+        this.add(overTimeAddButton);
+
     }
 
 
