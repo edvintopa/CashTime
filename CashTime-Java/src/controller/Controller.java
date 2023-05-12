@@ -110,11 +110,9 @@ public class Controller {
         }
     }
 
-
     public boolean isClockedIn() {
         return isClockedIn;
     }
-
 
     public void startInterval() {
         LocalDate date = LocalDate.now();
@@ -142,12 +140,9 @@ public class Controller {
         }
     }
 
-
-
     public void breakInterval(){
         currentInterval.setBreakTime(10);
     }
-
 
     public boolean checkWorkplaces(){
         File file = new File("workplaces.text");
@@ -164,7 +159,6 @@ public class Controller {
             }
         }
     }
-
 
     public void loadWorkplaces(){
         File file = new File("workplaces.text");
@@ -189,11 +183,9 @@ public class Controller {
         } catch (NullPointerException n) {}
     }
 
-
     public void addWorkspace(){
         String name = JOptionPane.showInputDialog(null, "Type in your workplace:");
         int hourlyPay = Integer.parseInt(JOptionPane.showInputDialog(null, "Type in your hourly pay:"));
-
         if(!name.isEmpty()){
             Workplace newWorkplace = new Workplace(name, hourlyPay);
             workplaces.add(newWorkplace);
@@ -206,6 +198,7 @@ public class Controller {
         historyPanel.updateWorkplaces();
         economyPanel.updateWorkplaces();
 
+        //Add the workplace name into the local file workplaces.text
         FileWriter writer;
         try {
             writer = new FileWriter("workplaces.text", true);
@@ -324,11 +317,6 @@ public class Controller {
 
         currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime, endDateTime, percentage, overTimeDays));
     }
-
-
-
-
-
 
     public void showHistory() {
         if(currentWorkplace!=null) updateInterval();

@@ -34,14 +34,12 @@ public class Interval implements Serializable {
         this.date = date;
     }
 
-
     public LocalDateTime getStart() {
         return start;
     }
     public void setStart(LocalDateTime start) {
         this.start = start;
     }
-
 
     public LocalDateTime getEnd() {
         return end;
@@ -50,17 +48,14 @@ public class Interval implements Serializable {
         this.end = end;
     }
 
-
     public Duration getDuration(){
         return duration;
     }
     public void setDuration(String newDuration) {this.duration = Duration.parse(newDuration);}
 
-
     public void setBreakTime(int breakTime){
         this.breakTime = breakTime;
     }
-
 
     public int getIndex() {
         return index;
@@ -68,7 +63,6 @@ public class Interval implements Serializable {
 
     public Duration calculateDuration() {
         return duration = Duration.between(start,end);
-
     }
 
     public Duration getOverTimeHours() {
@@ -121,6 +115,5 @@ public class Interval implements Serializable {
         this.regularHours = Duration.ofSeconds(regularSeconds);
         this.overTimeHours = duration.minus(getRegularHours());
     }
-
 
 }
