@@ -22,7 +22,5 @@ public class MainFrame extends JFrame {
         add(economyPanel);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-
     }
 }

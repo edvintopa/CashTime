@@ -15,8 +15,6 @@ public class Button extends JButton implements ActionListener {
         this.controller = controller;
     }
 
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton button = (JButton) e.getSource();
@@ -24,7 +22,10 @@ public class Button extends JButton implements ActionListener {
 
         switch (buttonText) {
             case "Break":
-                controller.breakInterval();
+                controller.startBreak();
+                break;
+            case "End Break":
+                controller.endBreak();
                 break;
             case "History":
                 controller.showHistory();

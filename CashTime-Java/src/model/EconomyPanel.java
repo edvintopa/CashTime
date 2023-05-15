@@ -143,7 +143,6 @@ public class EconomyPanel extends JPanel {
 
     }
 
-
     public void updateWorkplaces() {
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }

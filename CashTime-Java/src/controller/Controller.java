@@ -120,7 +120,7 @@ public class Controller {
         currentInterval = new Interval(currentWorkplace.getIntervalIndex(), date, time);
         currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
-        mainPanel.setClockBreak(true);
+        mainPanel.startInterval();
     }
 
     public void endInterval(){
@@ -130,7 +130,7 @@ public class Controller {
         currentWorkplace.getIntervals().add(currentInterval);
         currentWorkplace.save();
         isClockedIn = false;
-        mainPanel.setClockBreak(false);
+        mainPanel.endInterval();
         historyPanel.updateTable();
     }
 
@@ -140,8 +140,14 @@ public class Controller {
         }
     }
 
-    public void breakInterval(){
-        currentInterval.setBreakTime(10);
+    public void startBreak(){
+        mainPanel.startBreak();
+        currentInterval.startBreak();
+    }
+
+    public void endBreak() {
+        mainPanel.endBreak();
+        currentInterval.endBreak();
     }
 
     public boolean checkWorkplaces(){
@@ -308,14 +314,15 @@ public class Controller {
 
         for (OverTime overTime : currentWorkplace.getOverTimes()) {
             if (overTime.getOverTimeDays() != null && overTime.getOverTimeDays().equals(overTimeDays)) {
-                if (overTime.getStart().isBefore(endDateTime) && overTime.getEnd().isAfter(startDateTime)) {
+                if (overTime.getStart().isBefore(LocalTime.from(endDateTime)) && overTime.getEnd().isAfter(LocalTime.from(startDateTime))) {
                     JOptionPane.showMessageDialog(null, "The new overtime overlaps with an existing overtime of the same kind.");
                     return;
                 }
             }
         }
 
-        currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime, endDateTime, percentage, overTimeDays));
+        currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime.toLocalTime(), endDateTime.toLocalTime(), percentage, overTimeDays));
+        economyPanel.updatePage();
     }
 
     public void showHistory() {
@@ -340,4 +347,6 @@ public class Controller {
     public void showOverTime() {
 
     }
+
+
 }

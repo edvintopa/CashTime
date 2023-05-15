@@ -8,6 +8,7 @@ import java.awt.*;
 
 public class MainPanel extends JPanel {
     private Controller controller;
+    private Button clockInOut;
     private Button clockBreak;
     private JComboBox workplaces;
     private Button history;
@@ -42,7 +43,7 @@ public class MainPanel extends JPanel {
         workplaces.addActionListener(workplaces);
         this.add(workplaces);
 
-        Button clockInOut = new Button("IN/Out", controller);
+        clockInOut = new Button("IN", controller);
         clockInOut.setFont(new Font("Arial", Font.PLAIN, 16));
         clockInOut.setSize(100, 100);
         clockInOut.setLocation((width - clockInOut.getWidth()) / 2, 220);
@@ -103,10 +104,6 @@ public class MainPanel extends JPanel {
     }
 
 
-    public void setClockBreak(boolean b) {
-        this.clockBreak.setVisible(b);
-    }
-
     public void update(){
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
     }
@@ -117,5 +114,25 @@ public class MainPanel extends JPanel {
 
     public JButton getHistoryButton() {
         return history;
+    }
+
+    public void startInterval() {
+        clockInOut.setText("OUT");
+        clockBreak.setVisible(true);
+    }
+
+    public void endInterval(){
+        clockInOut.setText("IN");
+        clockBreak.setVisible(false);
+    }
+
+    public void startBreak() {
+        clockInOut.setVisible(false);
+        clockBreak.setText("End Break");
+    }
+
+    public void endBreak() {
+        clockInOut.setVisible(true);
+        clockBreak.setText("Break");
     }
 }

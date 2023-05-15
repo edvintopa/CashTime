@@ -151,9 +151,6 @@ public class HistoryPanel extends JPanel {
         return backButton;
     }
 
-
-
-
     class CustomTableModelListener implements TableModelListener {
         private Controller controller;
 
@@ -200,8 +197,6 @@ public class HistoryPanel extends JPanel {
             }
         }
     }
-
-
 
 
 }

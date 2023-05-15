@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class Interval implements Serializable {
@@ -13,25 +14,27 @@ public class Interval implements Serializable {
     LocalDate date;
     LocalDateTime start;
     LocalDateTime end;
-    Duration duration;
-    int breakTime;  // seconds
+    Duration duration; // Seconds
     List<OverTime> overTimeList;
-    private Duration regularHours;
-    private Duration overTimeHours;
+    private Duration regularHours = Duration.ZERO;
+    private Duration overTimeHours = Duration.ZERO;
 
+    private Duration breakTime = Duration.ZERO;
+    private LocalTime breakStart;
+    private LocalTime breakEnd;
 
     public Interval(int index, LocalDate date, LocalDateTime start) {
         this.index = index;
         this.date = date;
         this.start = start;
-        breakTime = 0;
     }
 
     public LocalDate getDate() {
-        return date;
+        return start.toLocalDate();
     }
     public void setDate(LocalDate date) {
-        this.date = date;
+        start = start.with(date);
+        end = end.with(date);
     }
 
     public LocalDateTime getStart() {
@@ -49,12 +52,24 @@ public class Interval implements Serializable {
     }
 
     public Duration getDuration(){
-        return duration;
+        return duration.minus(breakTime);
     }
     public void setDuration(String newDuration) {this.duration = Duration.parse(newDuration);}
 
-    public void setBreakTime(int breakTime){
-        this.breakTime = breakTime;
+    public void startBreak(){
+        breakStart = LocalTime.now();
+    }
+
+    public void endBreak() {
+        breakEnd = LocalTime.now();
+        calculateBreak();
+    }
+
+    private void calculateBreak() {
+        if (breakStart != null && breakEnd != null) {
+            Duration breakDuration = Duration.between(breakStart, breakEnd);
+            breakTime = breakTime.plus(breakDuration);
+        }
     }
 
     public int getIndex() {
@@ -83,18 +98,20 @@ public class Interval implements Serializable {
 
     public void calculateInterval(Controller controller){
         long regularSeconds = duration.getSeconds();
+        regularSeconds -= breakTime.getSeconds();
         for (OverTime overTime : controller.getCurrentWorkplace().getOverTimes()) {
             if (overTime.getOverTimeDays() != null && overTime.getOverTimeDays().contains(getStart().getDayOfWeek())) {
-                LocalDateTime overTimeStart = overTime.getStart().isAfter(start) ? overTime.getStart() : start;
-                LocalDateTime overTimeEnd = overTime.getEnd().isBefore(end) ? overTime.getEnd() : end;
+                LocalTime overTimeStart = LocalTime.from(overTime.getStart().isAfter(start.toLocalTime()) ? overTime.getStart() : start);
+                LocalTime overTimeEnd = LocalTime.from(overTime.getEnd().isBefore(end.toLocalTime()) ? overTime.getEnd() : end);
                 Duration overTimeDuration = Duration.between(overTimeStart, overTimeEnd);
                 long overTimeSeconds = overTimeDuration.getSeconds();
 
                 regularSeconds -= overTimeSeconds;
+                this.regularHours = Duration.ofSeconds(regularSeconds);
+                this.overTimeHours = duration.minus(getRegularHours());
             }
+
         }
-        this.regularHours = Duration.ofSeconds(regularSeconds);
-        this.overTimeHours = duration.minus(getRegularHours());
     }
 
     public void calculateInterval(Controller controller, LocalDate date){
@@ -102,18 +119,28 @@ public class Interval implements Serializable {
         LocalDateTime end = LocalDateTime.of(date, this.end.toLocalTime());
 
         long regularSeconds = duration.getSeconds();
+        regularSeconds -= breakTime.getSeconds();
         for (OverTime overTime : controller.getCurrentWorkplace().getOverTimes()) {
             if (overTime.getOverTimeDays() != null && overTime.getOverTimeDays().contains(date.getDayOfWeek())) {
-                LocalDateTime overTimeStart = overTime.getStart().isAfter(start) ? overTime.getStart() : start;
-                LocalDateTime overTimeEnd = overTime.getEnd().isBefore(end) ? overTime.getEnd() : end;
+                LocalDateTime overTimeStart = overTime.getStart().isAfter(start.toLocalTime()) ? LocalDateTime.of(date, overTime.getStart()) : start;
+                LocalDateTime overTimeEnd = overTime.getEnd().isBefore(end.toLocalTime()) ? LocalDateTime.of(date, overTime.getEnd()) : end;
                 Duration overTimeDuration = Duration.between(overTimeStart, overTimeEnd);
                 long overTimeSeconds = overTimeDuration.getSeconds();
 
+                if (start.isBefore(overTimeEnd) && end.isAfter(overTimeStart)) {
+                    LocalDateTime intervalStart = start.isAfter(overTimeStart) ? start : overTimeStart;
+                    LocalDateTime intervalEnd = end.isBefore(overTimeEnd) ? end : overTimeEnd;
+                    overTimeDuration = Duration.between(intervalStart, intervalEnd);
+                    overTimeSeconds = overTimeDuration.getSeconds();
+                }
+
                 regularSeconds -= overTimeSeconds;
+                this.regularHours = Duration.ofSeconds(regularSeconds);
+                this.overTimeHours = duration.minus(getRegularHours());
             }
         }
-        this.regularHours = Duration.ofSeconds(regularSeconds);
-        this.overTimeHours = duration.minus(getRegularHours());
     }
+
+
 
 }
