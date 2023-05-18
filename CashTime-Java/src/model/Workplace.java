@@ -34,7 +34,7 @@ public class Workplace implements Serializable{
         return intervals;
     }
 
-    public void save() {
+    public void saveWorkplaceToFile() {
         ObjectOutputStream oos;
         try {
             oos = new ObjectOutputStream(new FileOutputStream(name + ".dat"));
@@ -48,7 +48,7 @@ public class Workplace implements Serializable{
         }
     }
 
-    public Workplace load(){
+    public Workplace loadWorkplaceFromFile(){
         ObjectInputStream ois;
         try {
             ois = new ObjectInputStream(new FileInputStream(name + ".dat"));

@@ -192,7 +192,7 @@ public class HistoryPanel extends JPanel {
                     case 4:
                         controller.getCurrentWorkplace().getIntervals().get(row).setDuration(newValue);
                 }
-                controller.getCurrentWorkplace().save();
+                controller.getCurrentWorkplace().saveWorkplaceToFile();
                 updateTable();
             }
         }

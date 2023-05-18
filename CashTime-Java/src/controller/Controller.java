@@ -128,7 +128,7 @@ public class Controller {
         currentInterval.calculateDuration();
         currentInterval.calculateInterval(this);
         currentWorkplace.getIntervals().add(currentInterval);
-        currentWorkplace.save();
+        currentWorkplace.saveWorkplaceToFile();
         isClockedIn = false;
         mainPanel.endInterval();
         historyPanel.updateTable();
@@ -183,7 +183,7 @@ public class Controller {
                 String name = str[0];
                 double hourlyPay = Double.parseDouble(str[1]);
                 Workplace newWorkplace = new Workplace(name, hourlyPay);
-                newWorkplace = newWorkplace.load();
+                newWorkplace = newWorkplace.loadWorkplaceFromFile();
                 workplaces.add(newWorkplace);
             }
         } catch (NullPointerException n) {}
@@ -195,7 +195,7 @@ public class Controller {
         if(!name.isEmpty()){
             Workplace newWorkplace = new Workplace(name, hourlyPay);
             workplaces.add(newWorkplace);
-            newWorkplace.save();
+            newWorkplace.saveWorkplaceToFile();
         }
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
