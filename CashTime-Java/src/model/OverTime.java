@@ -7,14 +7,12 @@ import java.util.List;
 public class OverTime implements Serializable {
     private int percentage;
     private LocalDate date;
-    private LocalTime regularStart;
-    private LocalTime regularEnd;
     private LocalTime start;
     private LocalTime end;
     private List<DayOfWeek> overTimeDays;
 
-    public OverTime(LocalDate date, LocalDateTime start, LocalDateTime end, int percentage) {
-        this(date, start.toLocalTime(), end.toLocalTime(), percentage, null);
+    public OverTime(LocalDate date, LocalTime start, LocalTime end, int percentage) {
+        this(date, start, end, percentage, null);
     }
 
     public OverTime(LocalDate date, LocalTime start, LocalTime end, int percentage, List<DayOfWeek> overTimeDays) {
@@ -29,12 +27,20 @@ public class OverTime implements Serializable {
         return overTimeDays;
     }
 
+    public LocalDate getDate(){
+        return date;
+    }
+
     public LocalTime getStart() {
         return start;
     }
 
     public LocalTime getEnd() {
         return end;
+    }
+
+    public int getPercentage() {
+        return percentage;
     }
 
 }
