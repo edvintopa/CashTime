@@ -1,7 +1,9 @@
-package model;
+package view;
 
 import com.toedter.calendar.JDateChooser;
 import controller.Controller;
+import model.Interval;
+import model.Workplace;
 import view.Button;
 import view.JComboBox;
 
@@ -121,19 +123,25 @@ public class EconomyPanel extends JPanel {
             Workplace workplace = controller.getCurrentWorkplace();
             Date startDate = startDateChooser.getDate();
             Date endDate = endDateChooser.getDate();
+            double hourlyPay = workplace.getHourlyPay();
+            double overTimePay = 0;
 
             Duration regularHours = Duration.ZERO;
             Duration overTimeHours = Duration.ZERO;
             for (Interval interval : workplace.getIntervals()) {
-                if (interval.getDate().isAfter(startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) &&
-                        interval.getDate().isBefore(endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
+                if (interval.getDate().isAfter(startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) || interval.getDate().isEqual(startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) &&
+                        interval.getDate().isBefore(endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) || interval.getDate().isEqual(endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
                     regularHours = regularHours.plus(interval.getRegularHours());
+
                     overTimeHours = overTimeHours.plus(interval.getOverTimeHours());
+                    double overTimeRate = 1 + (interval.getPercentage() / 100.0);
+                    overTimePay += interval.getOverTimeHours().toMinutes() / 60.0 * hourlyPay * overTimeRate;
+
                 }
             }
-            double hourlyPay = workplace.getHourlyPay();
+
             double regularPay = regularHours.toMinutes() / 60.0 * hourlyPay;
-            double overTimePay = overTimeHours.toMinutes() / 60.0 * hourlyPay * 1.5;
+            //double overTimePay = overTimeHours.toMinutes() / 60.0 * hourlyPay * 1.5;
             double totalPay = regularPay + overTimePay;
 
             regularHoursLabel.setText(String.format("%.1f hours", regularHours.toMinutes() / 60.0));
@@ -149,6 +157,7 @@ public class EconomyPanel extends JPanel {
 
     public void setSelectedWorkplace(String wpName) {
         workplaces.setSelectedItem(wpName);
+        updatePage();
     }
 
     public void updatePage() {

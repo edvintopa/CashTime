@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import model.EconomyPanel;
+import com.toedter.calendar.JDateChooser;
+import view.EconomyPanel;
 import model.Interval;
 import model.OverTime;
 import model.Workplace;
 import view.MainFrame;
 import view.MainPanel;
 import view.HistoryPanel;
+import view.OverTimePanel;
 
 import javax.swing.*;
 
@@ -26,6 +28,7 @@ public class Controller {
     private MainPanel mainPanel;
     private HistoryPanel historyPanel;
     private EconomyPanel economyPanel;
+    private OverTimePanel overTimePanel;
 
 
     public static void main(String[] args) {
@@ -40,11 +43,14 @@ public class Controller {
         if(workplaces.size() != 0){
             currentWorkplace = workplaces.get(0);
         }
+        int height = 800;
+        int width = 600;
 
-        historyPanel = new HistoryPanel(500, 600, this);
-        economyPanel = new EconomyPanel(500, 600, this);
-        mainPanel = new MainPanel(500, 600, this);
-        view = new MainFrame(500, 600, this, mainPanel, historyPanel, economyPanel);
+        historyPanel = new HistoryPanel(width, height, this);
+        economyPanel = new EconomyPanel(width, height, this);
+        mainPanel = new MainPanel(width, height, this);
+        overTimePanel = new OverTimePanel(width, height, this);
+        view = new MainFrame(width, height, this, mainPanel, historyPanel, economyPanel, overTimePanel);
     }
 
     private void createWorkplace() {
@@ -95,6 +101,7 @@ public class Controller {
                     historyPanel.setSelectedWorkplace(w.getName());
                     historyPanel.updateTable();
                     economyPanel.setSelectedWorkplace(w.getName());
+                    overTimePanel.setSelectedWorkplace(w.getName());
                     //economyPanel.update();
                     break;
                 }
@@ -115,9 +122,23 @@ public class Controller {
     }
 
     public void startInterval() {
-        LocalDate date = LocalDate.now();
-        LocalDateTime time = LocalDateTime.now();
-        currentInterval = new Interval(currentWorkplace.getIntervalIndex(), date, time);
+        LocalDate currentDate = LocalDate.now();
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        // Check if the start time falls within existing intervals on the same date
+        boolean isStartTimeConflicting = currentWorkplace.getIntervals().stream()
+                .anyMatch(interval -> interval.getStart().toLocalDate().equals(currentDate)
+                        && interval.getStart().toLocalTime().isBefore(currentTime.toLocalTime())
+                        && interval.getEnd().toLocalTime().isAfter(currentTime.toLocalTime()));
+
+        if (isStartTimeConflicting) {
+            // Start time conflicts with existing intervals, notify the user or take appropriate action
+            JOptionPane.showMessageDialog(null, "Cannot start the interval. Start time conflicts with existing intervals.");
+            return;
+        }
+
+
+        currentInterval = new Interval(currentWorkplace.getIntervalIndex(), currentDate, currentTime);
         currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
         mainPanel.startInterval();
@@ -203,6 +224,7 @@ public class Controller {
         mainPanel.update();
         historyPanel.updateWorkplaces();
         economyPanel.updateWorkplaces();
+        overTimePanel.updateWorkplaces();
 
         //Add the workplace name into the local file workplaces.text
         FileWriter writer;
@@ -269,6 +291,7 @@ public class Controller {
                     }
                     startDateTime = startTime.atDate(startDate);
                     endDateTime = endTime.atDate(startDate);
+                    startDate = null;
                 } else {
                     return;
                 }
@@ -276,15 +299,12 @@ public class Controller {
 
             case 1: // Specific overtime
                 JPanel specificPanel = new JPanel(new GridLayout(4, 2));
-                specificPanel.add(new JLabel("Start Date:"));
-                JTextField startDateField = new JTextField();
-                specificPanel.add(startDateField);
+                specificPanel.add(new JLabel("Date:"));
+                JDateChooser dateChooser = new JDateChooser();
+                specificPanel.add(dateChooser);
                 specificPanel.add(new JLabel("Start Time:"));
                 startTimeField = new JTextField("00:00");
                 specificPanel.add(startTimeField);
-                specificPanel.add(new JLabel("End Date:"));
-                JTextField endDateField = new JTextField();
-                specificPanel.add(endDateField);
                 specificPanel.add(new JLabel("End Time:"));
                 endTimeField = new JTextField("00:00");
                 specificPanel.add(endTimeField);
@@ -293,20 +313,26 @@ public class Controller {
                 specificPanel.add(percentageField);
                 int specificResult = JOptionPane.showConfirmDialog(null, specificPanel, "Specific Overtime", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
                 if (specificResult == JOptionPane.OK_OPTION) {
-                    LocalDate specificStartDate = LocalDate.parse(startDateField.getText());
+                    LocalDate specificDate = dateChooser.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
                     LocalTime specificStartTime = LocalTime.parse(startTimeField.getText());
-                    LocalDate specificEndDate = LocalDate.parse(endDateField.getText());
                     LocalTime specificEndTime = LocalTime.parse(endTimeField.getText());
                     percentage = Integer.parseInt(percentageField.getText());
+
+                    if (checkSpecificOverTimeOverlap(specificDate)) {
+                        JOptionPane.showMessageDialog(null, "An existing specific overtime already exists for this date.");
+                        return;
+                    }
+
                     overTimeDays = null;
-                    startDate = specificStartDate;
-                    endDate = specificEndDate;
-                    startDateTime = specificStartTime.atDate(specificStartDate);
-                    endDateTime = specificEndTime.atDate(specificEndDate);
+                    startDate = specificDate;
+                    endDate = specificDate;
+                    startDateTime = specificStartTime.atDate(specificDate);
+                    endDateTime = specificEndTime.atDate(specificDate);
                 } else {
                     return;
                 }
                 break;
+
 
             default:
                 return;
@@ -322,8 +348,21 @@ public class Controller {
         }
 
         currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime.toLocalTime(), endDateTime.toLocalTime(), percentage, overTimeDays));
+        currentWorkplace.save();
         economyPanel.updatePage();
     }
+
+
+    private boolean checkSpecificOverTimeOverlap(LocalDate specificDate) {
+        for (OverTime overTime : currentWorkplace.getOverTimes()) {
+            if (overTime.getOverTimeDays() == null && overTime.getDate().isEqual(specificDate)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     public void showHistory() {
         if(currentWorkplace!=null) updateInterval();
@@ -336,6 +375,7 @@ public class Controller {
         mainPanel.setVisible(true);
         historyPanel.setVisible(false);
         economyPanel.setVisible(false);
+        overTimePanel.setVisible(false);
     }
 
     public void showEconomy() {
@@ -345,8 +385,21 @@ public class Controller {
     }
 
     public void showOverTime() {
-
+        overTimePanel.updatePage();
+        mainPanel.setVisible(false);
+        overTimePanel.setVisible(true);
     }
 
 
+    public void removeInterval() {
+        int row = historyPanel.getTable().getSelectedRow();
+        currentWorkplace.getIntervals().remove(row);
+        historyPanel.updateTable();
+        currentWorkplace.save();
+    }
+
+
+    public void removeOvertime(OverTime overtime) {
+
+    }
 }

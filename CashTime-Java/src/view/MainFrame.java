@@ -1,7 +1,6 @@
 package view;
 
 import controller.Controller;
-import model.EconomyPanel;
 
 import javax.swing.*;
 
@@ -9,7 +8,7 @@ public class MainFrame extends JFrame {
     private Controller controller;
 
 
-    public MainFrame(int width, int height, Controller controller, MainPanel mainPanel, HistoryPanel historyPanel, EconomyPanel economyPanel){
+    public MainFrame(int width, int height, Controller controller, MainPanel mainPanel, HistoryPanel historyPanel, EconomyPanel economyPanel, OverTimePanel overTimePanel){
         super("CashTime");
         this.controller = controller;
         setResizable(false);
@@ -20,6 +19,8 @@ public class MainFrame extends JFrame {
         add(historyPanel);
         economyPanel.setVisible(false);
         add(economyPanel);
+        overTimePanel.setVisible(false);
+        add(overTimePanel);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
