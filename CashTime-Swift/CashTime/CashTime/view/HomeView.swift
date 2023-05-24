@@ -20,6 +20,9 @@ struct HomeView: View {
             
             VStack {
                 
+                StatisticsView()
+                    .padding([.top, .leading], 20.0)        //Statistics showing expected salary and currently logged hours
+                
                 Spacer()
                 
                 ClockView()             //Clock showing current time
@@ -223,5 +226,29 @@ struct WorkplaceSelectorView: View {
                 //none for now
             }
         }
+    }
+}
+
+struct StatisticsView: View {
+    var body: some View {
+        VStack(alignment: .leading) {
+            HStack {
+                Text("20 341")  //pay var
+                    .font(.largeTitle)
+                    .bold()
+                Text("SEK")     //currency var
+                    .font(.largeTitle)
+                    .bold()
+            }
+            HStack {
+                Text("denna månad")
+                Text("83.4")    //hours worked var
+                    .bold()
+                Text("h")
+                    .bold()
+                    .padding(.leading, -6.0)
+            }
+        }
+        .padding(.trailing, 200.0)
     }
 }
