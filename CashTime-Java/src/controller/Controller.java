@@ -348,7 +348,7 @@ public class Controller {
         }
 
         currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime.toLocalTime(), endDateTime.toLocalTime(), percentage, overTimeDays));
-        currentWorkplace.save();
+        currentWorkplace.saveWorkplaceToFile();
         economyPanel.updatePage();
     }
 
@@ -395,7 +395,7 @@ public class Controller {
         int row = historyPanel.getTable().getSelectedRow();
         currentWorkplace.getIntervals().remove(row);
         historyPanel.updateTable();
-        currentWorkplace.save();
+        currentWorkplace.saveWorkplaceToFile();
     }
 
 
