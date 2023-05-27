@@ -9,13 +9,12 @@ import SwiftUI
 
 @main
 struct CashTimeApp: App {           //Main-klass? Startar programmet o initialiserar allt
-    //let viewModel = ViewModel()
-    let dummyController = DummyController()
+    let viewModel = ViewModel()
     
     var body: some Scene {
         WindowGroup {
             HomeView()
-                .environmentObject(dummyController)
+                .environmentObject(viewModel)
         }
     }
 }

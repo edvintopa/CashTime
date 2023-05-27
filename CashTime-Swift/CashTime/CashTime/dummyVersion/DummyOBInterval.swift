@@ -21,13 +21,13 @@ class DummyOBInterval: DummyInterval {
     }
     
     func getTimeSpentInOBInterval(interval: DummyInterval) -> TimeInterval {
-            var tempInterval = interval
-            if interval.getStart() < self.getStart() { // If starts before OB
-                tempInterval.setStart(start: self.getStart())
-            }
-            if interval.getEnd() > self.getEnd() { // If ends after OB
-                tempInterval.setEnd(end: self.getEnd())
-            }
-            return tempInterval.getDuration()
+        let tempInterval = interval
+        if interval.getStart() < self.getStart() { // If starts before OB
+            tempInterval.setStart(start: self.getStart())
         }
+        if interval.getEnd() > self.getEnd() { // If ends after OB
+            tempInterval.setEnd(end: self.getEnd())
+        }
+        return tempInterval.getDuration()
+    }
 }
