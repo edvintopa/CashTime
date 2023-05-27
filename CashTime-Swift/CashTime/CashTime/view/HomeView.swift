@@ -233,12 +233,12 @@ struct StatisticsView: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                Text("20 341")  //pay var
+                Text("20 341 kr")  //pay var
                     .font(.largeTitle)
                     .bold()
-                Text("SEK")     //currency var
+                /*Text("SEK")     //currency var
                     .font(.largeTitle)
-                    .bold()
+                    .bold()*/
             }
             HStack {
                 Text("denna månad")
