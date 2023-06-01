@@ -8,14 +8,10 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.toedter.calendar.JDateChooser;
-import view.EconomyPanel;
+import view.*;
 import model.Interval;
 import model.OverTime;
 import model.Workplace;
-import view.MainFrame;
-import view.MainPanel;
-import view.HistoryPanel;
-import view.OverTimePanel;
 
 import javax.swing.*;
 
@@ -29,6 +25,7 @@ public class Controller {
     private HistoryPanel historyPanel;
     private EconomyPanel economyPanel;
     private OverTimePanel overTimePanel;
+    private Settings settings;
 
 
     public static void main(String[] args) {
@@ -43,14 +40,15 @@ public class Controller {
         if(workplaces.size() != 0){
             currentWorkplace = workplaces.get(0);
         }
-        int height = 800;
-        int width = 600;
+        int height = 604;
+        int width = 294;
 
+        settings = new Settings(width, height, this);
         historyPanel = new HistoryPanel(width, height, this);
         economyPanel = new EconomyPanel(width, height, this);
         mainPanel = new MainPanel(width, height, this);
         overTimePanel = new OverTimePanel(width, height, this);
-        view = new MainFrame(width, height, this, mainPanel, historyPanel, economyPanel, overTimePanel);
+        view = new MainFrame(width, height, this, mainPanel, historyPanel, economyPanel, overTimePanel, settings);
     }
 
     private void createWorkplace() {
@@ -136,7 +134,6 @@ public class Controller {
             JOptionPane.showMessageDialog(null, "Cannot start the interval. Start time conflicts with existing intervals.");
             return;
         }
-
 
         currentInterval = new Interval(currentWorkplace.getIntervalIndex(), currentDate, currentTime);
         currentWorkplace.incrementIntervalIndex();
@@ -376,6 +373,9 @@ public class Controller {
         historyPanel.setVisible(false);
         economyPanel.setVisible(false);
         overTimePanel.setVisible(false);
+        settings.setVisible(false);
+
+        mainPanel.updateTotalPayLabel();
     }
 
     public void showEconomy() {
@@ -386,7 +386,7 @@ public class Controller {
 
     public void showOverTime() {
         overTimePanel.updatePage();
-        mainPanel.setVisible(false);
+        settings.setVisible(false);
         overTimePanel.setVisible(true);
     }
 
@@ -401,5 +401,10 @@ public class Controller {
 
     public void removeOvertime(OverTime overtime) {
 
+    }
+
+    public void showSettings() {
+        mainPanel.setVisible(false);
+        settings.setVisible(true);
     }
 }

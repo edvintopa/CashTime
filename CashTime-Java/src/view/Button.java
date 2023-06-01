@@ -39,6 +39,9 @@ public class Button extends JButton implements ActionListener {
             case "Economy":
                 controller.showEconomy();
                 break;
+            case "settings":
+                controller.showSettings();
+                break;
             case "+":
                 if(button.getName().equals("addWorkplace")){
                     controller.addWorkspace();

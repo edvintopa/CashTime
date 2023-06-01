@@ -61,7 +61,6 @@ public class Workplace implements Serializable{
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public String[][] getHistory(){

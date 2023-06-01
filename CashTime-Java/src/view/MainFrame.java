@@ -8,7 +8,7 @@ public class MainFrame extends JFrame {
     private Controller controller;
 
 
-    public MainFrame(int width, int height, Controller controller, MainPanel mainPanel, HistoryPanel historyPanel, EconomyPanel economyPanel, OverTimePanel overTimePanel){
+    public MainFrame(int width, int height, Controller controller, MainPanel mainPanel, HistoryPanel historyPanel, EconomyPanel economyPanel, OverTimePanel overTimePanel, Settings settings){
         super("CashTime");
         this.controller = controller;
         setResizable(false);
@@ -22,6 +22,8 @@ public class MainFrame extends JFrame {
         overTimePanel.setVisible(false);
         add(overTimePanel);
         setVisible(true);
+        settings.setVisible(false);
+        add(settings);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }
