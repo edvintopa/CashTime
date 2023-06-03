@@ -32,7 +32,6 @@ public class Controller {
         new Controller();
     }
 
-
     public Controller() {
         isClockedIn = false;
         workplaces = new ArrayList<>();
@@ -50,6 +49,7 @@ public class Controller {
         overTimePanel = new OverTimePanel(width, height, this);
         view = new MainFrame(width, height, this, mainPanel, historyPanel, economyPanel, overTimePanel, settings);
     }
+
 
     private void createWorkplace() {
         boolean wpAvailable = checkWorkplaces();
@@ -96,6 +96,7 @@ public class Controller {
             for(Workplace w : workplaces){
                 if(w.getName() == wpName){
                     currentWorkplace = w;
+                    mainPanel.updateTotalPayLabel();
                     historyPanel.setSelectedWorkplace(w.getName());
                     historyPanel.updateTable();
                     economyPanel.setSelectedWorkplace(w.getName());
@@ -135,7 +136,7 @@ public class Controller {
             return;
         }
 
-        currentInterval = new Interval(currentWorkplace.getIntervalIndex(), currentDate, currentTime);
+        currentInterval = new Interval(currentWorkplace.getIntervalIndex(), currentTime);
         currentWorkplace.incrementIntervalIndex();
         isClockedIn = true;
         mainPanel.startInterval();
@@ -217,6 +218,7 @@ public class Controller {
         }
         if(currentWorkplace == null){
             currentWorkplace = workplaces.get(0);
+            System.out.println("Test");
         }
         mainPanel.update();
         historyPanel.updateWorkplaces();
@@ -363,6 +365,7 @@ public class Controller {
 
     public void showHistory() {
         if(currentWorkplace!=null) updateInterval();
+        //historyPanel.updatePage();
         mainPanel.setVisible(false);
         historyPanel.setVisible(true);
         historyPanel.updateTable();
@@ -371,9 +374,11 @@ public class Controller {
     public void showMainPanel() {
         mainPanel.setVisible(true);
         historyPanel.setVisible(false);
+        historyPanel.closeFilterPanel();
         economyPanel.setVisible(false);
         overTimePanel.setVisible(false);
         settings.setVisible(false);
+        settings.closeAbout();
 
         mainPanel.updateTotalPayLabel();
     }
@@ -406,5 +411,9 @@ public class Controller {
     public void showSettings() {
         mainPanel.setVisible(false);
         settings.setVisible(true);
+    }
+
+    public void showFilter() {
+        historyPanel.showFilterPanel();
     }
 }

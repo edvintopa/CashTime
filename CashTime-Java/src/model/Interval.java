@@ -7,35 +7,41 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class Interval implements Serializable {
-    int index;
-    private LocalDate date;
+    private int index;
     private LocalDateTime start;
     private LocalDateTime end;
     private Duration duration; // Seconds
     private List<OverTime> overTimeList;
-    private Duration regularHours = Duration.ZERO;
-    private Duration overTimeHours = Duration.ZERO;
-    private int overTimePercentage = 0;
+    private Duration regularHours;
+    private Duration overTimeHours;
+    private int overTimePercentage;
 
-    private Duration breakTime = Duration.ZERO;
+    private Duration breakTime;
     private LocalTime breakStart;
     private LocalTime breakEnd;
 
-    public Interval(int index, LocalDate date, LocalDateTime start) {
+    public Interval(int index, LocalDateTime start) {
         this.index = index;
-        this.date = date;
         this.start = start;
+        this.regularHours = Duration.ZERO;
+        this.overTimeHours = Duration.ZERO;
+        breakTime = Duration.ZERO;
+        this.overTimePercentage = 0;
     }
 
     public LocalDate getDate() {
         return start.toLocalDate();
     }
+
     public void setDate(LocalDate date) {
-        start = start.with(date);
-        end = end.with(date);
+        LocalDateTime newStart = start.with(date);
+        start = newStart;
+        LocalDateTime newEnd = end.with(date);
+        end = newEnd;
     }
 
     public LocalDateTime getStart() {
@@ -55,9 +61,12 @@ public class Interval implements Serializable {
     }
 
     public Duration getDuration(){
-        return duration.minus(breakTime);
+        Duration dur = Duration.ofSeconds(duration.minus(breakTime).getSeconds());
+        return dur;
     }
-    public void setDuration(String newDuration) {this.duration = Duration.parse(newDuration);}
+    public void setDuration(String newDuration) {
+        this.duration = Duration.parse(newDuration);
+    }
 
     public void startBreak(){
         breakStart = LocalTime.now();
@@ -71,7 +80,7 @@ public class Interval implements Serializable {
     private void calculateBreak() {
         if (breakStart != null && breakEnd != null) {
             Duration breakDuration = Duration.between(breakStart, breakEnd);
-            breakTime = breakTime.plus(breakDuration);
+            breakTime = Duration.ofSeconds(breakTime.plus(breakDuration).getSeconds());
         }
     }
 
@@ -80,8 +89,12 @@ public class Interval implements Serializable {
     }
 
     public Duration calculateDuration() {
-        duration = Duration.between(start,end);
-        regularHours = Duration.ofSeconds(duration.getSeconds());
+        if(!(start.toLocalTime() == end.toLocalTime()) || !(start.getHour() == end.getHour())){
+            duration = Duration.between(start,end);
+        } else {
+            duration = Duration.between(start,end);
+        }
+        regularHours = Duration.ofSeconds(duration.getSeconds()).truncatedTo(ChronoUnit.MINUTES);
         return duration;
     }
 
@@ -101,7 +114,7 @@ public class Interval implements Serializable {
         if (!controller.getCurrentWorkplace().getOverTimes().isEmpty()) {
             for (OverTime overTime : controller.getCurrentWorkplace().getOverTimes()) {
                 if(overTime.getDate() != null){
-                    if (overTime.getDate().equals(date)) {
+                    if (overTime.getDate().equals(start.toLocalDate())) {
                         selectedOverTime = overTime;
                         break;
                     }
@@ -111,26 +124,41 @@ public class Interval implements Serializable {
             }
 
             if (selectedOverTime != null) {
-                if(!selectedOverTime.getStart().isAfter(end.toLocalTime()) && !selectedOverTime.getEnd().isBefore(start.toLocalTime())){
+                if(!selectedOverTime.getStart().isAfter(end.toLocalTime()) && !selectedOverTime.getEnd().isBefore(start.toLocalTime()) ){
                     LocalTime overTimeStart = LocalTime.from(selectedOverTime.getStart().isAfter(start.toLocalTime()) ? selectedOverTime.getStart() : start);
                     LocalTime overTimeEnd = LocalTime.from(selectedOverTime.getEnd().isBefore(end.toLocalTime()) ? selectedOverTime.getEnd() : end);
                     Duration overTimeDuration = Duration.between(overTimeStart, overTimeEnd);
                     long overTimeSeconds = overTimeDuration.getSeconds();
 
-                    regularSeconds -= overTimeSeconds;
-                    this.overTimeHours = duration.minus(getRegularHours());
+                    //regularSeconds -= overTimeSeconds;
+
+                    //this.overTimeHours = duration.minus(getRegularHours());
+                    if(!(start.toLocalTime() == end.toLocalTime()) || start.isEqual(end)) {
+                        overTimeHours = Duration.ofSeconds(overTimeSeconds).truncatedTo(ChronoUnit.MINUTES);
+                    } else {
+                        overTimeHours = Duration.ofSeconds(overTimeSeconds).truncatedTo(ChronoUnit.MINUTES);
+                    }
+
                     overTimePercentage = selectedOverTime.getPercentage();
                 } else {
+                    this.regularHours = Duration.ofSeconds(regularSeconds).truncatedTo(ChronoUnit.MINUTES);
                     overTimeHours = Duration.ZERO;
+                    overTimePercentage = 0;
                 }
-                this.regularHours = Duration.ofSeconds(regularSeconds);
+
+            } else {
+                this.regularHours = Duration.ofSeconds(regularSeconds).truncatedTo(ChronoUnit.MINUTES);
+                overTimeHours = Duration.ZERO;
+                overTimePercentage = 0;
             }
         } else {
-            this.regularHours = Duration.ofSeconds(regularSeconds);
+            this.regularHours = Duration.ofSeconds(regularSeconds).truncatedTo(ChronoUnit.MINUTES);
+            this.overTimeHours = Duration.ZERO;
+            overTimePercentage = 0;
         }
     }
 
-
+/*
     public void calculateInterval(Controller controller, LocalDate date){
         LocalDateTime start = LocalDateTime.of(date, this.start.toLocalTime());
         LocalDateTime end = LocalDateTime.of(date, this.end.toLocalTime());
@@ -157,6 +185,8 @@ public class Interval implements Serializable {
             }
         }
     }
+
+ */
 
 
     public int getPercentage() {

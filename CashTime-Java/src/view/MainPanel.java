@@ -113,7 +113,7 @@ public class MainPanel extends JPanel {
         economy.setBackground(Color.BLACK);
         economy.setForeground(new Color(255, 215, 0));
         economy.addActionListener(economy);
-        this.add(economy);
+        //this.add(economy);
 
         Button overtime = new Button("Overtimes", controller);
         overtime.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -122,7 +122,7 @@ public class MainPanel extends JPanel {
         overtime.setBackground(Color.BLACK);
         overtime.setForeground(new Color(255, 215, 0));
         overtime.addActionListener(overtime);
-        this.add(overtime);
+        //this.add(overtime);
 
 /*
         Button overTimeAddButton = new Button("+", controller);
@@ -226,7 +226,7 @@ public class MainPanel extends JPanel {
         Date endDateObj = Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
         // Call the calculate() method with the start and end dates
-        double totalPay = calculate(startDateObj, endDateObj);
+        double totalPay = calculate(startDate, endDate);
 
         // Update the label text
         DecimalFormat decimalFormat = new DecimalFormat("#"); // Format the total pay with two decimal places
@@ -234,10 +234,10 @@ public class MainPanel extends JPanel {
 
         // Refresh the label
         totalPayLabel.repaint();
+        getThisMonthTotalHours().repaint();
     }
 
-    private double calculate(Date startDate, Date endDate) {
-        // Your existing calculate() method implementation goes here
+    private double calculate(LocalDate startDate, LocalDate endDate) {
         double totalPay = 0;
         if(controller.getCurrentWorkplace() != null){
             Workplace workplace = controller.getCurrentWorkplace();
@@ -247,20 +247,25 @@ public class MainPanel extends JPanel {
             Duration regularHours = Duration.ZERO;
             Duration overTimeHours = Duration.ZERO;
             for (Interval interval : workplace.getIntervals()) {
-                if (interval.getDate().isAfter(startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) || interval.getDate().isEqual(startDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) &&
-                        interval.getDate().isBefore(endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()) || interval.getDate().isEqual(endDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
-                    regularHours = regularHours.plus(interval.getRegularHours());
+                if (interval.getDate().isAfter(startDate) || interval.getDate().isEqual(startDate) &&
+                        interval.getDate().isBefore(endDate) || interval.getDate().isEqual(endDate)) {
 
+                    regularHours = regularHours.plus(interval.getRegularHours());
+                    System.out.println("regularHours: "+regularHours.toMinutes());
                     overTimeHours = overTimeHours.plus(interval.getOverTimeHours());
-                    double overTimeRate = 1 + (interval.getPercentage() / 100.0);
+                    System.out.println("overTimeHours: "+overTimeHours.toMinutes());
+                    double overTimeRate = (interval.getPercentage() / 100.0);
                     overTimePay += interval.getOverTimeHours().toMinutes() / 60.0 * hourlyPay * overTimeRate;
 
                 }
             }
 
             double regularPay = regularHours.toMinutes() / 60.0 * hourlyPay;
+            System.out.println("regularPay: "+regularPay);
             //double overTimePay = overTimeHours.toMinutes() / 60.0 * hourlyPay * 1.5;
             totalPay = regularPay + overTimePay;
+            System.out.println("overtimePay: "+overTimePay);
+
 
             thisMonthTotalHours.setText(String.format("%.1f h", regularHours.toMinutes() / 60.0));
             //overTimeHoursLabel.setText(String.format("%.1f hours", overTimeHours.toMinutes() / 60.0));
@@ -268,5 +273,9 @@ public class MainPanel extends JPanel {
         }
         // Return the calculated total pay
         return totalPay;
+    }
+
+    public JLabel getThisMonthTotalHours() {
+        return thisMonthTotalHours;
     }
 }

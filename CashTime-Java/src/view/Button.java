@@ -21,10 +21,13 @@ public class Button extends JButton implements ActionListener {
         String buttonText = button.getText();
 
         switch (buttonText) {
-            case "Overtimes":
+            case "Manage Overtimes":
                 controller.showOverTime();
                 break;
-            case "Remove":
+            case "Filter":
+                controller.showFilter();
+                break;
+            case "Remove Interval":
                 controller.removeInterval();
                 break;
             case "Break":
@@ -42,16 +45,15 @@ public class Button extends JButton implements ActionListener {
             case "settings":
                 controller.showSettings();
                 break;
-            case "+":
-                if(button.getName().equals("addWorkplace")){
-                    controller.addWorkspace();
-                } else {
-                    if(controller.getCurrentWorkplace() == null){
-                        JOptionPane.showMessageDialog(null, "No Workplace chosen!");
-                        return;
-                    }
-                    controller.addOverTime();
+            case "Add Workplace":
+                controller.addWorkspace();
+                break;
+            case "Add Overtime":
+                if(controller.getCurrentWorkplace() == null){
+                    JOptionPane.showMessageDialog(null, "No Workplace chosen!");
+                    return;
                 }
+                controller.addOverTime();
                 break;
             case "<":
                 controller.showMainPanel();

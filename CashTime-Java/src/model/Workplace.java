@@ -66,25 +66,28 @@ public class Workplace implements Serializable{
     public String[][] getHistory(){
         String[][] str = new String[intervals.size()][6];
         for(int i=0; i< intervals.size(); i++){
-            str[i][0] = String.valueOf(intervals.get(i).getIndex());
-            str[i][1] = intervals.get(i).getStart().toLocalDate().toString();
-            str[i][2] = intervals.get(i).getStart().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
-            str[i][3] = intervals.get(i).getEnd().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+            str[i][0] = intervals.get(i).getStart().toLocalDate().toString();
+            str[i][1] = intervals.get(i).getStart().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
+            str[i][2] = intervals.get(i).getEnd().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT));
 
             Duration duration = intervals.get(i).getDuration();
-            long hours = duration.toHours();
-            long minutes = duration.minusHours(hours).toMinutes();
-            String durationString = String.format("%d:%02d", hours, minutes);
-            str[i][4] = durationString;
+            if(duration != null){
+                long hours = duration.toHours();
+                long minutes = duration.minusHours(hours).toMinutes();
+                String durationString = String.format("PT%dH%dM", hours, minutes);
+                str[i][3] = durationString;
+            } else {
+                str[i][3] = String.valueOf(Duration.ZERO);
+            }
 
             Duration overTimeDuration = intervals.get(i).getOverTimeHours();
             if (overTimeDuration != null) {
                 long overTimeHours = overTimeDuration.toHours();
                 long overTimeMinutes = overTimeDuration.minusHours(overTimeHours).toMinutes();
-                String overTimeDurationString = String.format("%d:%02d", overTimeHours, overTimeMinutes);
-                str[i][5] = overTimeDurationString;
+                String overTimeDurationString = String.format("PT%dH%dM", overTimeHours, overTimeMinutes);
+                str[i][4] = overTimeDurationString;
             } else {
-                str[i][5] = "";
+                str[i][4] = "";
             }
 
             }

@@ -47,7 +47,7 @@ public class OverTimePanel extends JPanel {
         this.add(backButton);
 
         JButton removeButton = new JButton("Remove");
-        removeButton.setBounds(20, 130, 100, 30);
+        removeButton.setBounds(170, 130, 100, 30);
         removeButton.addActionListener(e -> {
             OverTime selectedOverTime = overtimeList.getSelectedValue();
             if (selectedOverTime != null) {
@@ -63,11 +63,11 @@ public class OverTimePanel extends JPanel {
 
 
         JScrollPane overtimeListScrollPane = new JScrollPane(overtimeList);
-        overtimeListScrollPane.setBounds(0,200, 200, 600);
+        overtimeListScrollPane.setBounds(0,80, 150, 170);
         this.add(overtimeListScrollPane);
 
         JScrollPane overtimeInfoScrollPane = new JScrollPane(overtimeInfoTextArea);
-        overtimeInfoScrollPane.setBounds(200, 200, width - 200, 600);
+        overtimeInfoScrollPane.setBounds(0, 250, width, height-250);
         this.add(overtimeInfoScrollPane);
 
         overtimeList.addListSelectionListener(e -> {
@@ -139,7 +139,7 @@ public class OverTimePanel extends JPanel {
                 setText("");
             } else {
                 if (value.getDate() == null) {
-                    setText("Regular Overtime (" + value.getPercentage() + "%)");
+                    setText("Weekly Overtime (" + value.getPercentage() + "%)");
                 } else {
                     String date = value.getDate().format(DATE_FORMATTER);
                     setText(date + " (" + value.getPercentage() + "%)");
