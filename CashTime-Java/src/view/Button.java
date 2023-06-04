@@ -21,7 +21,7 @@ public class Button extends JButton implements ActionListener {
         String buttonText = button.getText();
 
         switch (buttonText) {
-            case "Manage Overtimes":
+            case "Overtimes List":
                 controller.showOverTime();
                 break;
             case "Filter":

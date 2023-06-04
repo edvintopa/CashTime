@@ -12,23 +12,27 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
 
 public class MainPanel extends JPanel {
-    private Controller controller;
-    private Button clockInOut;
-    private Button clockBreak;
-    private JComboBox workplaces;
-    private Button history;
-    private Button economy;
-    private JLabel totalPayLabel;
-    private JLabel thisMonthTotalHours;
-    private int width;
+    private final Controller controller;
+    private final Button clockInOut;
+    private final Button clockBreak;
+    private final JComboBox workplaces;
+    private final Button history;
+    private final Button economy;
+    private final JLabel totalPayLabel;
+    private final JLabel thisMonthTotalHours;
+    private final int width;
     private Settings settings;
 
+    private LocalTime startTime;
+    private Timer timer;
 
     public MainPanel(int width, int height, Controller controller){
         super(null);
@@ -56,16 +60,18 @@ public class MainPanel extends JPanel {
         }
         workplaces.setFont(new Font("Arial", Font.PLAIN, 16));
         workplaces.setName("main");
-        workplaces.setSize(120, 30);
-        workplaces.setLocation((width - workplaces.getWidth()) / 2, 160+150);
+        workplaces.setSize(100, 20);
+        workplaces.setLocation((width - workplaces.getWidth()) / 2, 160+130);
         workplaces.setAlignmentY(CENTER_ALIGNMENT);
+        workplaces.setBackground(Color.BLACK);
+        workplaces.setForeground(Color.WHITE);
         workplaces.addActionListener(workplaces);
         this.add(workplaces);
 
         clockInOut = new Button("IN", controller);
         clockInOut.setFont(new Font("Arial", Font.BOLD, 16));
         clockInOut.setSize(100, 50);
-        clockInOut.setLocation((width - clockInOut.getWidth()) / 2, 220+150);
+        clockInOut.setLocation((width - clockInOut.getWidth()) / 2, 220+130);
         clockInOut.setBorder(new RoundedBorder(10)); //10 is the radius
         clockInOut.setBackground(new Color(48, 210, 91));
         clockInOut.setForeground(new Color(255, 255, 255));
@@ -75,7 +81,7 @@ public class MainPanel extends JPanel {
         clockBreak = new Button("Break", controller);
         clockBreak.setFont(new Font("Arial", Font.BOLD, 16));
         clockBreak.setSize(100, 50);
-        clockBreak.setLocation(((width - clockInOut.getWidth()) / 2) - (clockInOut.getWidth() / 2) - 10, 220+150);
+        clockBreak.setLocation(((width - clockInOut.getWidth()) / 2) - (clockInOut.getWidth() / 2) - 10, 220+130);
         clockBreak.setBorder(new RoundedBorder(10)); //10 is the radius
         clockBreak.setBackground(new Color(255, 216, 25));
         clockBreak.setForeground(new Color(255, 255, 255));
@@ -175,8 +181,46 @@ public class MainPanel extends JPanel {
         settingsButton.setBorder(emptyBorder);
         settingsButton.addActionListener(settingsButton);
         add(settingsButton);
+
+        JLabel time = new JLabel();
+        time.setText(LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")));
+        time.setFont(new Font("Arial", Font.BOLD, 42));
+        time.setBounds(90, 200, 150, 40);
+        time.setBackground(Color.BLACK);
+        time.setForeground(Color.WHITE);
+        add(time);
+
+        Timer clockTimer = new Timer(1000, e -> {
+            // Update the label with the current time
+            LocalTime currentTime = LocalTime.now();
+            String formattedTime = currentTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+            time.setText(formattedTime);
+        });
+        clockTimer.start();
+
+        JLabel duration = new JLabel();
+        duration.setText("00:00:00");
+        duration.setFont(new Font("Arial", Font.PLAIN, 16));
+        duration.setBounds(111, 240, 150, 15);
+        duration.setHorizontalAlignment(SwingConstants.LEFT);
+        duration.setBackground(Color.BLACK);
+        duration.setForeground(Color.WHITE);
+        add(duration);
+
+
+        timer = new Timer(1000, e -> {
+            Duration elapsedTime = Duration.between(startTime, LocalTime.now());
+            String formattedDuration = formatDuration(elapsedTime);
+            duration.setText(formattedDuration);
+        });
     }
 
+    private String formatDuration(Duration duration) {
+        long hours = duration.toHours();
+        long minutes = duration.toMinutesPart();
+        long seconds = duration.toSecondsPart();
+        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+    }
 
     public void update(){
         workplaces.setModel(new DefaultComboBoxModel(controller.getWorkplaces()));
@@ -191,13 +235,16 @@ public class MainPanel extends JPanel {
     }
 
     public void startInterval() {
+        startTime = LocalTime.now();
+        timer.start();
         clockInOut.setText("OUT");
         clockInOut.setBackground(new Color(255, 71, 63));
-        clockInOut.setLocation(((width - clockInOut.getWidth()) / 2) + (clockInOut.getWidth() / 2) +10, 220+150);
+        clockInOut.setLocation(((width - clockInOut.getWidth()) / 2) + (clockInOut.getWidth() / 2) +10, 220+130);
         clockBreak.setVisible(true);
     }
 
     public void endInterval(){
+        timer.stop();
         clockInOut.setText("IN");
         clockInOut.setBackground(new Color(48, 210, 91));
         clockInOut.setLocation((width - clockInOut.getWidth()) / 2, 220+150);
@@ -251,9 +298,9 @@ public class MainPanel extends JPanel {
                         interval.getDate().isBefore(endDate) || interval.getDate().isEqual(endDate)) {
 
                     regularHours = regularHours.plus(interval.getRegularHours());
-                    System.out.println("regularHours: "+regularHours.toMinutes());
+                    //System.out.println("regularHours: "+regularHours.toMinutes());
                     overTimeHours = overTimeHours.plus(interval.getOverTimeHours());
-                    System.out.println("overTimeHours: "+overTimeHours.toMinutes());
+                   // System.out.println("overTimeHours: "+overTimeHours.toMinutes());
                     double overTimeRate = (interval.getPercentage() / 100.0);
                     overTimePay += interval.getOverTimeHours().toMinutes() / 60.0 * hourlyPay * overTimeRate;
 
@@ -261,10 +308,10 @@ public class MainPanel extends JPanel {
             }
 
             double regularPay = regularHours.toMinutes() / 60.0 * hourlyPay;
-            System.out.println("regularPay: "+regularPay);
+           // System.out.println("regularPay: "+regularPay);
             //double overTimePay = overTimeHours.toMinutes() / 60.0 * hourlyPay * 1.5;
             totalPay = regularPay + overTimePay;
-            System.out.println("overtimePay: "+overTimePay);
+           // System.out.println("overtimePay: "+overTimePay);
 
 
             thisMonthTotalHours.setText(String.format("%.1f h", regularHours.toMinutes() / 60.0));

@@ -348,7 +348,7 @@ public class Controller {
 
         currentWorkplace.getOverTimes().add(new OverTime(startDate, startDateTime.toLocalTime(), endDateTime.toLocalTime(), percentage, overTimeDays));
         currentWorkplace.saveWorkplaceToFile();
-        economyPanel.updatePage();
+        historyPanel.updatePage();
     }
 
 
@@ -365,7 +365,7 @@ public class Controller {
 
     public void showHistory() {
         if(currentWorkplace!=null) updateInterval();
-        //historyPanel.updatePage();
+        historyPanel.updatePage();
         mainPanel.setVisible(false);
         historyPanel.setVisible(true);
         historyPanel.updateTable();

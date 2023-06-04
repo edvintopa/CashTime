@@ -5,6 +5,7 @@ import model.OverTime;
 import model.Workplace;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.time.DayOfWeek;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +23,7 @@ public class OverTimePanel extends JPanel {
         super(null);
         this.controller = controller;
         setSize(width, height);
+        setBackground(Color.BLACK);
 
         if (controller.getWorkplaces() == null) {
             String[] str = new String[1];
@@ -40,14 +42,29 @@ public class OverTimePanel extends JPanel {
         workplaceLabel.setBounds(78+50+50+50+50, 10+15, 80, 20);
         this.add(workplaceLabel);
 
+        ImageIcon icon = new ImageIcon("back.png");
+        Image img = icon.getImage() ;
+        Image newimg = img.getScaledInstance( 30, 30,  java.awt.Image.SCALE_SMOOTH ) ;
+        icon = new ImageIcon( newimg );
+
+        Border emptyBorder = BorderFactory.createEmptyBorder();
+
         backButton = new Button("<", controller);
-        backButton.setSize(45, 45);
-        backButton.setLocation(5, 5);
+        backButton.setSize(30, 30);
+        backButton.setLocation(5, 20);
+        backButton.setBackground(Color.BLACK);
+        backButton.setIcon(icon);
+        backButton.setVerticalAlignment(SwingConstants.CENTER);
+        backButton.setHorizontalAlignment(SwingConstants.LEFT);
+        backButton.setBorder(emptyBorder);
         backButton.addActionListener(backButton);
         this.add(backButton);
 
         JButton removeButton = new JButton("Remove");
         removeButton.setBounds(170, 130, 100, 30);
+        removeButton.setBackground(Color.BLACK);
+        removeButton.setForeground(Color.WHITE);
+        removeButton.setBorder(emptyBorder);
         removeButton.addActionListener(e -> {
             OverTime selectedOverTime = overtimeList.getSelectedValue();
             if (selectedOverTime != null) {
@@ -59,7 +76,12 @@ public class OverTimePanel extends JPanel {
         overtimeListModel = new DefaultListModel<>();
         overtimeList = new JList<>(overtimeListModel);
         overtimeList.setCellRenderer(new OverTimeListCellRenderer());
+        overtimeList.setBackground(Color.BLACK);
+        overtimeList.setForeground(Color.WHITE);
+        overtimeList.setBorder(emptyBorder);
         overtimeInfoTextArea = new JTextArea();
+        overtimeInfoTextArea.setBackground(Color.BLACK);
+        overtimeInfoTextArea.setForeground(Color.WHITE);
 
 
         JScrollPane overtimeListScrollPane = new JScrollPane(overtimeList);

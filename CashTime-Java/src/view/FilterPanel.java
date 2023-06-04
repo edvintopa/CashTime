@@ -6,6 +6,7 @@ import controller.Controller;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+import java.util.Calendar;
 
 public class FilterPanel extends JPanel {
     private JComboBox workplaces;
@@ -31,11 +32,17 @@ public class FilterPanel extends JPanel {
         add(workplaces);
 
         startDateChooser = new JDateChooser();
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        startDateChooser.setDate(cal.getTime());
         startDateChooser.setBounds(10, 40, 100, 20);
         startDateChooser.addPropertyChangeListener("date", e -> history.updateTable());
         add(startDateChooser);
 
+
         endDateChooser = new JDateChooser();
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        endDateChooser.setDate(cal.getTime());
         endDateChooser.setBounds(10, 70, 100, 20);
         endDateChooser.addPropertyChangeListener("date", e -> history.updateTable());
         add(endDateChooser);

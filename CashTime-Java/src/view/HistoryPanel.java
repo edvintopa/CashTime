@@ -1,6 +1,7 @@
 package view;
 import com.toedter.calendar.JDateChooser;
 import controller.Controller;
+import model.Interval;
 import model.Workplace;
 
 
@@ -14,6 +15,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -23,10 +25,14 @@ public class HistoryPanel extends JPanel {
     private String[] columns;
     private JTable table;
     private Button backButton;
-    private JDateChooser startDateChooser;
-    private JDateChooser endDateChooser;
+//    private JDateChooser startDateChooser;
+//    private JDateChooser endDateChooser;
     private FilterPanel filterPanel;
     private JButton showFilterButton;
+
+    private JLabel regularHoursLabel;
+    private JLabel overTimeHoursLabel;
+    private JLabel totalPayLabel;
 
 
     public HistoryPanel(int width, int height, Controller controller) {
@@ -103,7 +109,7 @@ public class HistoryPanel extends JPanel {
         backButton.addActionListener(backButton);
         this.add(backButton);
 
-        columns = new String[]{"Date", "Start", "End", "Hours", "OB"};
+        columns = new String[]{"Date", "Start", "End", "Hours", "OT"};
         DefaultTableModel tableModel = createTableModel(controller, null,null);
         table = new JTable(tableModel);
         table.getColumnModel().getColumn(0).setPreferredWidth(60);
@@ -113,7 +119,7 @@ public class HistoryPanel extends JPanel {
         table.getModel().addTableModelListener(new CustomTableModelListener(controller));
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setSize(width, 320);
-        scrollPane.setLocation(0, 150+100);
+        scrollPane.setLocation(-1, 150+100);
         table.setFillsViewportHeight(true);
         table.setBackground(Color.BLACK);
         table.setForeground(Color.WHITE);
@@ -167,6 +173,46 @@ public class HistoryPanel extends JPanel {
         removeInterval.setBorder(new RoundedBorder(10));
         removeInterval.addActionListener(removeInterval);
         this.add(removeInterval);
+
+
+        //Economy
+
+        JLabel regularHoursTitleLabel = new JLabel("Hours:");
+        regularHoursTitleLabel.setBounds(10, 90, 80, 20);
+        regularHoursTitleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        regularHoursTitleLabel.setHorizontalAlignment(JLabel.LEFT);
+        regularHoursTitleLabel.setForeground(Color.WHITE);
+        add(regularHoursTitleLabel);
+        regularHoursLabel = new JLabel();
+        regularHoursLabel.setBounds(100, 90, 200, 20);
+        regularHoursLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        regularHoursLabel.setForeground(Color.WHITE);
+        add(regularHoursLabel);
+
+        JLabel overTimeHoursTitleLabel = new JLabel("OT:");
+        overTimeHoursTitleLabel.setBounds(10, 120, 80, 20);
+        overTimeHoursTitleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        overTimeHoursTitleLabel.setHorizontalAlignment(JLabel.LEFT);
+        overTimeHoursTitleLabel.setForeground(Color.WHITE);
+        add(overTimeHoursTitleLabel);
+        overTimeHoursLabel = new JLabel();
+        overTimeHoursLabel.setBounds(100, 120, 200, 20);
+        overTimeHoursLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        overTimeHoursLabel.setForeground(Color.WHITE);
+        add(overTimeHoursLabel);
+
+        JLabel totalPayTitleLabel = new JLabel("Salary:");
+        totalPayTitleLabel.setBounds(10, 150, 80, 20);
+        totalPayTitleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        totalPayTitleLabel.setHorizontalAlignment(JLabel.LEFT);
+        totalPayTitleLabel.setForeground(Color.WHITE);
+        add(totalPayTitleLabel);
+        totalPayLabel = new JLabel();
+        totalPayLabel.setBounds(100, 150, 200, 20);
+        totalPayLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        totalPayTitleLabel.setBackground(Color.BLACK);
+        totalPayLabel.setForeground(Color.WHITE);
+        add(totalPayLabel);
     }
 
     public void updateWorkplaces() {
@@ -177,6 +223,7 @@ public class HistoryPanel extends JPanel {
 
     public void setSelectedWorkplace(String wpName) {
         filterPanel.setSelectedItem(wpName);
+        updatePage();
     }
 
     public void updateTable() {
@@ -196,6 +243,7 @@ public class HistoryPanel extends JPanel {
         table.getColumnModel().getColumn(3).setCellRenderer(new DurationCellRenderer());
         table.getColumnModel().getColumn(4).setCellRenderer(new DurationCellRenderer());
         table.getModel().addTableModelListener(new CustomTableModelListener(controller));
+        updatePage();
     }
 
     private DefaultTableModel createTableModel(Controller controller, LocalDate startDate, LocalDate endDate) {
@@ -334,7 +382,48 @@ public class HistoryPanel extends JPanel {
 
 
     public void updatePage(){
-        table.setModel(createTableModel(controller, null, null));
+        calculate(filterPanel.getStartDateChooser().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), filterPanel.getEndDateChooser().getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+    }
+
+    private double calculate(LocalDate startDate, LocalDate endDate) {
+        double totalPay = 0;
+        if(controller.getCurrentWorkplace() != null){
+            Workplace workplace = controller.getCurrentWorkplace();
+            double hourlyPay = workplace.getHourlyPay();
+            double overTimePay = 0;
+
+            Duration regularHours = Duration.ZERO;
+            Duration overTimeHours = Duration.ZERO;
+            for (Interval interval : workplace.getIntervals()) {
+                if ( (interval.getDate().isAfter(startDate) || interval.getDate().isEqual(startDate)) &&
+                        (interval.getDate().isBefore(endDate) || interval.getDate().isEqual(endDate)) ) {
+
+                    regularHours = regularHours.plus(interval.getRegularHours());
+                    System.out.println("regularHours: "+regularHours.toMinutes());
+                    overTimeHours = overTimeHours.plus(interval.getOverTimeHours());
+                    System.out.println("overTimeHours: "+overTimeHours.toMinutes());
+                    double overTimeRate = (interval.getPercentage() / 100.0);
+                    overTimePay += interval.getOverTimeHours().toMinutes() / 60.0 * hourlyPay * overTimeRate;
+
+                }
+            }
+
+            double regularPay = regularHours.toMinutes() / 60.0 * hourlyPay;
+            System.out.println("regularPay: "+regularPay);
+            //double overTimePay = overTimeHours.toMinutes() / 60.0 * hourlyPay * 1.5;
+            totalPay = regularPay + overTimePay;
+            System.out.println("overtimePay: "+overTimePay);
+            System.out.println("TotalPay: " + totalPay);
+
+            System.out.println();
+
+
+            regularHoursLabel.setText(String.format("%.1f h", regularHours.toMinutes() / 60.0));
+            overTimeHoursLabel.setText(String.format("%.1f h", overTimeHours.toMinutes() / 60.0));
+            totalPayLabel.setText(String.format("%.2f kr", totalPay));
+        }
+        // Return the calculated total pay
+        return totalPay;
     }
 
 }

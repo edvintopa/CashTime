@@ -134,8 +134,8 @@ public class Settings extends JPanel {
     }
 
     private String getAboutText() {
-        return "Welcome to our Time Tracker application!\n\n" +
-                "This tool is designed to help you track your working hours and manage your overtime efficiently.\n\n" +
+        return "Welcome to CashTime!\n\n" +
+                "This free light-weight tool is designed to help you track your working hours and manage your overtime efficiently.\n\n" +
                 "Key features:\n" +
                 "- Clock in and out with ease\n" +
                 "- Monitor your working hours and overtime\n" +
