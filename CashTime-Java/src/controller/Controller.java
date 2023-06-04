@@ -18,7 +18,12 @@ import view.HistoryPanel;
 import view.OverTimePanel;
 
 import javax.swing.*;
-
+/**
+ * The Controller class handles the logic and interaction between the various views and models in the application.
+ * It manages the clock-in/clock-out functionality, workplace management, intervals, overtime, and UI updates.
+ *
+ * @author Mustafa Abbas
+ */
 public class Controller {
     private boolean isClockedIn;
     private List<Workplace> workplaces;
@@ -30,12 +35,20 @@ public class Controller {
     private EconomyPanel economyPanel;
     private OverTimePanel overTimePanel;
 
-
+    /**
+     * The main method to start the application.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         new Controller();
     }
 
-
+    /**
+     * Constructs a new instance of the Controller class.
+     * Initializes the application by creating the necessary views and loading existing workplaces.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public Controller() {
         isClockedIn = false;
         workplaces = new ArrayList<>();
@@ -53,6 +66,10 @@ public class Controller {
         view = new MainFrame(width, height, this, mainPanel, historyPanel, economyPanel, overTimePanel);
     }
 
+    /**
+     * Checks if there are existing workplaces and loads them if available, otherwise prompts the user to create new workplaces.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     private void createWorkplace() {
         boolean wpAvailable = checkWorkplaces();
         if(wpAvailable){
@@ -60,6 +77,14 @@ public class Controller {
         }
     }
 
+    /**
+     * Calculates the time spent in different rate schedules for the given interval and workplace.
+     * This method can be customized based on the specific requirements of the application.
+     *
+     * @param interval  the interval for which the time spent is to be calculated
+     * @param workplace the workplace for which the time spent is to be calculated
+     * @author Mustafa Abbas, Alexandru Som
+     */
     private void calcTimeSpent(Interval interval, Workplace workplace) {
         //Duration total = interval.getDuration();
         //Duration ob1 = workplace.getRateSchedule().get(0).getTimeSpentInOBInterval(interval);
@@ -77,6 +102,12 @@ public class Controller {
         //System.out.println("OB time 2: " + ob2.toHours());
     }
 
+    /**
+     * Retrieves the names of all workplaces as an array of strings.
+     *
+     * @return an array of workplace names
+     * @author Mustafa Abbas
+     */
     public String[] getWorkplaces() {
         String[] str = new String[workplaces.size()];
         if(workplaces.size()==0){
@@ -89,10 +120,24 @@ public class Controller {
         return str;
     }
 
+    /**
+     * Retrieves the currently selected workplace.
+     *
+     * @return the current workplace
+     * @author Mustafa Abbas
+     */
     public Workplace getCurrentWorkplace() {
         return currentWorkplace;
     }
 
+    /**
+     * Sets the current workplace based on the given workplace name and window type.
+     * Updates the selected workplace in all relevant panels.
+     *
+     * @param wpName the name of the workplace to set as current
+     * @param window the type of window ('main' or 'other')
+     * @author Alexandru Som, Mustafa Abbas
+     */
     public void setCurrentWorkplace(String wpName, String window) {
         if(window == "main"){
             for(Workplace w : workplaces){
@@ -117,10 +162,22 @@ public class Controller {
         }
     }
 
+    /**
+     * Checks if the user is currently clocked in.
+     *
+     * @return true if clocked in, false otherwise
+     * @author Mustafa Abbas
+     */
     public boolean isClockedIn() {
         return isClockedIn;
     }
 
+    /**
+     * Starts a new interval and sets the clock-in time.
+     * Checks if the start time conflicts with existing intervals on the same date.
+     * Displays an error message if there is a conflict.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void startInterval() {
         LocalDate currentDate = LocalDate.now();
         LocalDateTime currentTime = LocalDateTime.now();
@@ -144,6 +201,12 @@ public class Controller {
         mainPanel.startInterval();
     }
 
+    /**
+     * Ends the current interval and sets the clock-out time.
+     * Calculates the duration and interval based on the clock-in and clock-out times.
+     * Saves the interval to the current workplace and updates the UI.
+     * @author Mustafa Abbas
+     */
     public void endInterval(){
         currentInterval.setEnd(LocalDateTime.now());
         currentInterval.calculateDuration();
@@ -154,23 +217,40 @@ public class Controller {
         mainPanel.endInterval();
         historyPanel.updateTable();
     }
-
+    /**
+     * Updates the duration and intervals for all existing intervals in the current workplace.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void updateInterval(){
         for(int i=0; i<currentWorkplace.getIntervals().size(); i++){
             currentWorkplace.getIntervals().get(i).calculateInterval(this);
         }
     }
 
+    /**
+     * Starts a break within the current interval.
+     * @author Mustafa Abbas
+     */
     public void startBreak(){
         mainPanel.startBreak();
         currentInterval.startBreak();
     }
 
+    /**
+     * Ends the current break within the current interval.
+     * @author Mustafa Abbas
+     */
     public void endBreak() {
         mainPanel.endBreak();
         currentInterval.endBreak();
     }
 
+    /**
+     * Checks if there are existing workplaces by attempting to read the "workplaces.text" file.
+     *
+     * @return true if workplaces exist, false otherwise
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public boolean checkWorkplaces(){
         File file = new File("workplaces.text");
         Scanner sc;
@@ -187,6 +267,10 @@ public class Controller {
         }
     }
 
+    /**
+     * Loads the workplaces from the "workplaces.text" file and adds them to the application.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void loadWorkplaces(){
         File file = new File("workplaces.text");
         Scanner sc;
@@ -210,6 +294,11 @@ public class Controller {
         } catch (NullPointerException n) {}
     }
 
+    /**
+     * Adds a new workplace based on user input.
+     * Saves the workplace to a file and updates the UI.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void addWorkspace(){
         String name = JOptionPane.showInputDialog(null, "Type in your workplace:");
         int hourlyPay = Integer.parseInt(JOptionPane.showInputDialog(null, "Type in your hourly pay:"));
@@ -241,7 +330,12 @@ public class Controller {
             throw new RuntimeException(e);
         }
     }
-
+    /**
+     * Adds overtime based on user input.
+     * Validates the input and checks for conflicts with existing overtime.
+     * Saves the overtime to the current workplace and updates the economy panel.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void addOverTime() {
         Object[] options = {"Weekly Overtime", "Specific Overtime"};
         int choice = JOptionPane.showOptionDialog(null, "Choose overtime type:", "Overtime", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -352,7 +446,12 @@ public class Controller {
         economyPanel.updatePage();
     }
 
-
+    /**
+     * Checks if there is any specific overtime overlap for the given date.
+     * @param specificDate The date to check for overlap.
+     * @return true if there is overlap, false otherwise.
+     * @author Mustafa Abbas
+     */
     private boolean checkSpecificOverTimeOverlap(LocalDate specificDate) {
         for (OverTime overTime : currentWorkplace.getOverTimes()) {
             if (overTime.getOverTimeDays() == null && overTime.getDate().isEqual(specificDate)) {
@@ -363,7 +462,10 @@ public class Controller {
     }
 
 
-
+    /**
+     * Shows the history panel and updates the interval information.
+     * @author Mustafa Abbas
+     */
     public void showHistory() {
         if(currentWorkplace!=null) updateInterval();
         mainPanel.setVisible(false);
@@ -371,6 +473,10 @@ public class Controller {
         historyPanel.updateTable();
     }
 
+    /**
+     * Shows the main panel and hides other panels.
+     * @author Mustafa Abbas
+     */
     public void showMainPanel() {
         mainPanel.setVisible(true);
         historyPanel.setVisible(false);
@@ -378,12 +484,19 @@ public class Controller {
         overTimePanel.setVisible(false);
     }
 
+    /**
+     * Shows the economy panel.
+     * @author Mustafa Abbas
+     */
     public void showEconomy() {
         mainPanel.setVisible(false);
         economyPanel.setVisible(true);
         economyPanel.updatePage();
     }
-
+    /**
+     * Shows the overtime panel.
+     * @author Mustafa Abbas
+     */
     public void showOverTime() {
         overTimePanel.updatePage();
         mainPanel.setVisible(false);
@@ -391,6 +504,10 @@ public class Controller {
     }
 
 
+    /**
+     * Removes the selected interval from the current workplace.
+     * @author Mustafa Abbas
+     */
     public void removeInterval() {
         int row = historyPanel.getTable().getSelectedRow();
         currentWorkplace.getIntervals().remove(row);

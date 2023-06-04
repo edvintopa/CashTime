@@ -10,7 +10,10 @@ public class OverTime implements Serializable {
     private LocalTime start;
     private LocalTime end;
     private List<DayOfWeek> overTimeDays;
-
+    /**
+     * Represents the OverTime(OB) of the worplace for a specific percentage extra for the amount of money on payroll.
+     * @author Mustafa Abbas
+     */
     public OverTime(LocalDate date, LocalTime start, LocalTime end, int percentage) {
         this(date, start, end, percentage, null);
     }

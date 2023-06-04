@@ -14,7 +14,11 @@ public class Workplace implements Serializable{
     private List<Interval> intervals;
     private int intervalIndex;
     private List<OverTime> overTimes;
-
+    /**
+     * Represents the Workplace with all info, that is name, hourly pay, intervals.
+     * @author Mustafa Abbas, Alexandru Som
+     * (Sidenote: every method not javadoc commented are setters and getters which are written by Mustafa Abbas)
+     */
     public Workplace(String name, double pay) {
         this.name = name;
         this.hourlyPay = pay;
@@ -34,6 +38,10 @@ public class Workplace implements Serializable{
         return intervals;
     }
 
+    /**
+     * Saves the workplace locally as a .dat file through objectoutputstrea with its name.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void saveWorkplaceToFile() {
         ObjectOutputStream oos;
         try {

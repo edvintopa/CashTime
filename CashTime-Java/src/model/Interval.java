@@ -9,6 +9,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * Represents an interval of time for a specific date.
+ * @author Mustafa Abbas, Alexandru Som
+ * (Sidenote: every method not javadoc commented are setters and getters which are written by Mustafa Abbas)
+ */
 public class Interval implements Serializable {
     int index;
     private LocalDate date;
@@ -24,6 +29,13 @@ public class Interval implements Serializable {
     private LocalTime breakStart;
     private LocalTime breakEnd;
 
+    /**
+     * Constructs an Interval object with the specified index, date, and start time.
+     *
+     * @param index The index of the interval.
+     * @param date  The date of the interval.
+     * @param start The start time of the interval.
+     */
     public Interval(int index, LocalDate date, LocalDateTime start) {
         this.index = index;
         this.date = date;
@@ -63,11 +75,19 @@ public class Interval implements Serializable {
         breakStart = LocalTime.now();
     }
 
+    /**
+     * Ends the break by recording the break end time and calculating the break duration.
+     * @author Mustafa Abbas
+     */
     public void endBreak() {
         breakEnd = LocalTime.now();
         calculateBreak();
     }
 
+    /**
+     * Calculates the break duration by subtracting the break start time from the break end time.
+     * @author Mustafa Abbas
+     */
     private void calculateBreak() {
         if (breakStart != null && breakEnd != null) {
             Duration breakDuration = Duration.between(breakStart, breakEnd);
@@ -79,6 +99,10 @@ public class Interval implements Serializable {
         return index;
     }
 
+    /**
+     * Calculates the duration, regular hours, and overtime hours for the interval based on the current workplace settings.
+     * @author Mustafa Abbas
+     */
     public Duration calculateDuration() {
         duration = Duration.between(start,end);
         regularHours = Duration.ofSeconds(duration.getSeconds());
@@ -93,6 +117,12 @@ public class Interval implements Serializable {
         return regularHours;
     }
 
+    /**
+     * Calculates the duration, regular hours, and overtime hours for the interval based on the current workplace settings.
+     *
+     * @param controller The controller used to access the current workplace.
+     * @author Mustafa Abbas, Alexandru Som
+     */
     public void calculateInterval(Controller controller) {
         long regularSeconds = duration.getSeconds();
         regularSeconds -= breakTime.getSeconds();

@@ -180,7 +180,7 @@ public class OverTimePanel extends JPanel {
         Workplace currentWorkplace = controller.getCurrentWorkplace();
         if (currentWorkplace != null) {
             currentWorkplace.getOverTimes().remove(overTime);
-            currentWorkplace.save();
+            currentWorkplace.saveWorkplaceToFile();
             overtimeInfoTextArea.setText("");
             updatePage();
         }
